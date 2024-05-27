@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\PersonalAccessToken;
 
 /**
  * @property int $id
@@ -21,8 +23,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $remember_token
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
+ * @property-read DatabaseNotificationCollection<DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read Collection<PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
  *
  * @method static UserFactory<static> factory($count = null, $state = [])
  * @method static static newModelQuery()
@@ -50,6 +54,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'alias',
         'name',
         'email',
         'password',
