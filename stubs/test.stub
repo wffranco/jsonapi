@@ -12,7 +12,7 @@ class {{ class }} extends TestCase
 
     public function test_example(): void
     {
-        $response = $this->getJson('/api/v1/info');
+        $response = $this->getJsonApi('/api/v1/info');
 
         $response->assertStatus(200);
     }

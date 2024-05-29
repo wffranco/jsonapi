@@ -16,8 +16,9 @@ class ListArticlesTest extends TestCase
     public function test_can_fetch_a_single_article(): void
     {
         $article = Article::factory()->create();
+        $route = route('api.v1.articles.show', $article);
 
-        $this->getJson(route('api.v1.articles.show', $article))
+        $this->getJsonApi($route)
             ->assertOk()
             ->assertExactJson([
                 'data' => [
@@ -29,7 +30,7 @@ class ListArticlesTest extends TestCase
                         'slug' => $article->slug,
                     ],
                     'links' => [
-                        'self' => route('api.v1.articles.show', $article),
+                        'self' => $route,
                     ],
                 ],
             ]);
@@ -39,7 +40,7 @@ class ListArticlesTest extends TestCase
     {
         $articles = Article::factory()->count(3)->create();
 
-        $this->getJson(route('api.v1.articles.index'))
+        $this->getJsonApi(route('api.v1.articles.index'))
             ->assertOk()
             ->assertJsonCount(3, 'data')
             ->assertExactJson([

@@ -14,77 +14,63 @@ class ValidateJsonApiHeadersTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Route::any('/headers', fn () => 'OK')->middleware(ValidateJsonApiHeaders::class);
+        Route::prefix('/test/api')->middleware(ValidateJsonApiHeaders::class)->group(function () {
+            Route::any('headers', fn () => 'OK');
+            Route::any('empty', fn () => response()->noContent());
+        });
     }
 
     public function test_accept_header_must_be_present_in_all_requests(): void
     {
-        $this->get('/headers')->assertStatus(406);
+        $this->get('/test/api/headers')->assertStatus(406);
 
-        $this->get('/headers', [
+        $this->get('/test/api/headers', [
             'Accept' => 'application/vnd.api+json',
         ])->assertSuccessful();
+
+        $this->getJsonApi('/test/api/headers')->assertSuccessful();
     }
 
     public function test_content_type_header_must_be_present_in_all_post_requests(): void
     {
-        $this->post('/headers', [], [
+        $this->post('/test/api/headers', [], [
             'Accept' => 'application/vnd.api+json',
         ])->assertStatus(415);
 
-        $this->post('/headers', [], [
+        $this->post('/test/api/headers', [], [
             'Accept' => 'application/vnd.api+json',
             'Content-Type' => 'application/vnd.api+json',
         ])->assertSuccessful();
+
+        $this->postJsonApi('/test/api/headers')->assertSuccessful();
     }
 
     public function test_content_type_header_must_be_present_in_all_patch_requests(): void
     {
-        Route::patch('/headers', fn () => 'OK')->middleware(ValidateJsonApiHeaders::class);
-
-        $this->patch('/headers', [], [
+        $this->patch('/test/api/headers', [], [
             'Accept' => 'application/vnd.api+json',
         ])->assertStatus(415);
 
-        $this->patch('/headers', [], [
+        $this->patch('/test/api/headers', [], [
             'Accept' => 'application/vnd.api+json',
             'Content-Type' => 'application/vnd.api+json',
         ])->assertSuccessful();
+
+        $this->patchJsonApi('/test/api/headers')->assertSuccessful();
     }
 
     public function test_content_type_header_must_be_present_in_responses(): void
     {
-        $this->get('/headers', [
-            'Accept' => 'application/vnd.api+json',
-        ])->assertHeader('Content-Type', 'application/vnd.api+json');
-        $this->post('/headers', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])->assertHeader('Content-Type', 'application/vnd.api+json');
-        $this->patch('/headers', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])->assertHeader('Content-Type', 'application/vnd.api+json');
+        $this->getJsonApi('/test/api/headers')->assertHeader('Content-Type', 'application/vnd.api+json');
+        $this->postJsonApi('/test/api/headers')->assertHeader('Content-Type', 'application/vnd.api+json');
+        $this->patchJsonApi('/test/api/headers')->assertHeader('Content-Type', 'application/vnd.api+json');
     }
 
     public function test_content_type_header_must_not_be_present_in_empty_responses(): void
     {
-        Route::any('/empty', fn () => response()->noContent())->middleware(ValidateJsonApiHeaders::class);
-
-        $this->get('/empty', [
-            'Accept' => 'application/vnd.api+json',
-        ])->assertHeaderMissing('Content-Type');
-        $this->post('/empty', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])->assertHeaderMissing('Content-Type');
-        $this->patch('/empty', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])->assertHeaderMissing('Content-Type');
-        $this->delete('/empty', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])->assertHeaderMissing('Content-Type');
+        $this->getJsonApi('/test/api/empty')->assertHeaderMissing('Content-Type');
+        $this->postJsonApi('/test/api/empty')->assertHeaderMissing('Content-Type');
+        $this->patchJsonApi('/test/api/empty')->assertHeaderMissing('Content-Type');
+        $this->deleteJsonApi('/test/api/empty')->assertHeaderMissing('Content-Type');
     }
 }

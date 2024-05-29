@@ -23,7 +23,7 @@ class CreateArticlesTest extends TestCase
                 'slug' => 'slug',
             ],
         ];
-        $response = $this->postJson(route('api.v1.articles.store'), [
+        $response = $this->postJsonApi(route('api.v1.articles.store'), [
             'data' => $data,
         ]);
 
