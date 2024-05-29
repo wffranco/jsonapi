@@ -23,20 +23,44 @@ class CreateArticlesTest extends TestCase
                 'slug' => 'slug',
             ],
         ];
-        $response = $this->postJsonApi(route('api.v1.articles.store'), [
-            'data' => $data,
-        ]);
+        $response = $this->postJsonApi(route('api.v1.articles.store'), ['data' => $data]);
 
         $article = Article::first();
+        $route = route('api.v1.articles.show', $article);
         $response->assertCreated()
-            ->assertHeader('Location', route('api.v1.articles.show', $article))
+            ->assertHeader('Location', $route)
             ->assertExactJson([
-                'data' => $data + [
-                    'id' => (string) $article->getRouteKey(),
-                    'links' => [
-                        'self' => route('api.v1.articles.show', $article),
-                    ],
-                ],
+                'data' => array_merge(
+                    ['id' => (string) $article->getRouteKey()],
+                    $data,
+                    ['links' => ['self' => $route]],
+                ),
             ]);
+    }
+
+    public function test_title_is_required(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'data' => [
+                'type' => 'articles',
+                'attributes' => [
+                    'content' => 'Content',
+                    'slug' => 'slug',
+                ],
+            ],
+        ])->assertJsonValidationErrors('data.attributes.title');
+    }
+
+    public function test_content_is_required(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'data' => [
+                'type' => 'articles',
+                'attributes' => [
+                    'title' => 'Title',
+                    'slug' => 'slug',
+                ],
+            ],
+        ])->assertJsonValidationErrors('data.attributes.content');
     }
 }
