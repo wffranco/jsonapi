@@ -3,6 +3,7 @@
  * Don't import or include this file in any part of the application.
  * It's just a custom IDE helper to improve the autocompletion.
 **/
+require __DIR__ . '/app/JsonApi/_ide_helper.php';
 
 namespace Illuminate\Contracts\Auth {
     /**

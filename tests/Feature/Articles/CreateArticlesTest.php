@@ -49,16 +49,7 @@ class CreateArticlesTest extends TestCase
                 ],
             ],
         ])
-            ->assertStatus(422)
-            ->assertHeader('Content-Type', 'application/vnd.api+json')
-            ->assertJsonStructure([
-                'errors' => [
-                    ['title', 'detail', 'source' => ['pointer']],
-                ],
-            ])
-            ->assertJsonFragment([
-                'source' => ['pointer' => '/data/attributes/title'],
-            ]);
+            ->assertJsonApiValidationErrors('title');
     }
 
     public function test_content_is_required(): void
@@ -72,15 +63,6 @@ class CreateArticlesTest extends TestCase
                 ],
             ],
         ])
-            ->assertStatus(422)
-            ->assertHeader('Content-Type', 'application/vnd.api+json')
-            ->assertJsonStructure([
-                'errors' => [
-                    ['title', 'detail', 'source' => ['pointer']],
-                ],
-            ])
-            ->assertJsonFragment([
-                'source' => ['pointer' => '/data/attributes/content'],
-            ]);
+            ->assertJsonApiValidationErrors('content');
     }
 }
