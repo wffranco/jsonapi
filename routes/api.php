@@ -10,3 +10,4 @@ Route::withoutMiddleware(ValidateJsonApiHeaders::class)
 Route::get('articles', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
 Route::post('articles', [ArticleController::class, 'store'])->name('articles.store');
+Route::patch('articles/{article}', [ArticleController::class, 'update'])->name('articles.update');

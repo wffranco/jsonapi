@@ -35,4 +35,20 @@ class ArticleController extends Controller
 
         return ArticleResource::make($article);
     }
+
+    public function update(Request $request, Article $article): ArticleResource
+    {
+        $request->validate([
+            'data.attributes.title' => 'required',
+            'data.attributes.content' => 'required',
+            'data.attributes.slug' => 'required',
+        ]);
+        $article->update([
+            'title' => $request->input('data.attributes.title'),
+            'content' => $request->input('data.attributes.content'),
+            'slug' => $request->input('data.attributes.slug'),
+        ]);
+
+        return ArticleResource::make($article);
+    }
 }

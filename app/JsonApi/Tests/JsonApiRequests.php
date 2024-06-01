@@ -60,12 +60,12 @@ trait JsonApiRequests
     {
         $headers['Accept'] = 'application/vnd.api+json';
         if (! isset($data['data'])) {
-            $data = [
-                'data' => [
-                    'type' => (string) \Str::of($uri)->after('api/v1/'),
-                    'attributes' => $data,
-                ],
-            ];
+            $segments = explode('/', (string) \Str::of(parse_url($uri, PHP_URL_PATH))->afterNext('api/v1/'));
+            $data = ['data' => array_filter([
+                'type' => $segments[0] ?? null,
+                'id' => $segments[1] ?? null,
+                'attributes' => $data,
+            ])];
         }
 
         return $this->json($method, $uri, $data, $headers, $options);
