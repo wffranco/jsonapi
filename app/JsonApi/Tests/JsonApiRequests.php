@@ -17,8 +17,11 @@ trait JsonApiRequests
         TestResponse::macro('assertJsonApiValidationErrors', function ($attribute) {
             /** @var TestResponse $this */
             try {
+                if (! \Str::startsWith($attribute, 'data')) {
+                    $attribute = "data.attributes.{$attribute}";
+                }
                 $this->assertJsonFragment([
-                    'source' => ['pointer' => "/data/attributes/{$attribute}"],
+                    'source' => ['pointer' => '/'.str_replace('.', '/', $attribute)],
                 ]);
             } catch (ExpectationFailedException $e) {
                 PHPUnit::fail("Failed to find a JSON:API validation error for attribute '{$attribute}'".PHP_EOL.PHP_EOL.$e->getMessage());

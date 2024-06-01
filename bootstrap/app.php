@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(append: [
             \App\Http\Middleware\ValidateJsonApiHeaders::class,
+            \App\Http\Middleware\ValidateJsonApiDocument::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -31,6 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
                         'detail' => $message[0],
                         'source' => ['pointer' => '/'.str_replace('.', '/', $field)],
                     ])->values(),
-            ], 422);
+            ], 422, [
+                'Content-Type' => 'application/vnd.api+json',
+            ]);
         });
     })->create();
