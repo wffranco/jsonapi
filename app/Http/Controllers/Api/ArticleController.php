@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreArticleRequest;
 use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ArticleController extends Controller
 {
@@ -20,35 +21,24 @@ class ArticleController extends Controller
         return ArticleResource::make($article);
     }
 
-    public function store(Request $request): ArticleResource
+    public function store(StoreArticleRequest $request): ArticleResource
     {
-        $request->validate([
-            'data.attributes.title' => ['required'],
-            'data.attributes.content' => ['required'],
-            'data.attributes.slug' => ['required'],
-        ]);
-        $article = Article::create([
-            'title' => $request->input('data.attributes.title'),
-            'content' => $request->input('data.attributes.content'),
-            'slug' => $request->input('data.attributes.slug'),
-        ]);
+        $article = Article::create($request->validated('attributes'));
 
         return ArticleResource::make($article);
     }
 
-    public function update(Request $request, Article $article): ArticleResource
+    public function update(StoreArticleRequest $request, Article $article): ArticleResource
     {
-        $request->validate([
-            'data.attributes.title' => 'required',
-            'data.attributes.content' => 'required',
-            'data.attributes.slug' => 'required',
-        ]);
-        $article->update([
-            'title' => $request->input('data.attributes.title'),
-            'content' => $request->input('data.attributes.content'),
-            'slug' => $request->input('data.attributes.slug'),
-        ]);
+        $article->update($request->validated('attributes'));
 
         return ArticleResource::make($article);
+    }
+
+    public function destroy(Article $article): Response
+    {
+        $article->delete();
+
+        return response()->noContent();
     }
 }
