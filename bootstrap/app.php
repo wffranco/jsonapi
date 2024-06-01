@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,5 +23,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (ValidationException $e) {
+            return response()->json([
+                'errors' => collect($e->errors())
+                    ->map(fn ($message, $field) => [
+                        'title' => $e->getMessage(),
+                        'detail' => $message[0],
+                        'source' => ['pointer' => '/'.str_replace('.', '/', $field)],
+                    ])->values(),
+            ], 422);
+        });
     })->create();
