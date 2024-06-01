@@ -59,6 +59,14 @@ trait JsonApiRequests
     public function jsonApi($method, $uri, array $data = [], array $headers = [], $options = 0): TestResponse
     {
         $headers['Accept'] = 'application/vnd.api+json';
+        if (! isset($data['data'])) {
+            $data = [
+                'data' => [
+                    'type' => (string) \Str::of($uri)->after('api/v1/'),
+                    'attributes' => $data,
+                ],
+            ];
+        }
 
         return $this->json($method, $uri, $data, $headers, $options);
     }

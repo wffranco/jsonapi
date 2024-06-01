@@ -15,39 +15,32 @@ class CreateArticlesTest extends TestCase
 
     public function test_can_create_articles(): void
     {
-        $data = [
-            'type' => 'articles',
-            'attributes' => [
-                'title' => 'Title',
-                'content' => 'Content',
-                'slug' => 'slug',
-            ],
+        $attributes = [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'slug',
         ];
-        $response = $this->postJsonApi(route('api.v1.articles.store'), ['data' => $data]);
+        $response = $this->postJsonApi(route('api.v1.articles.store'), $attributes);
 
         $article = Article::first();
         $route = route('api.v1.articles.show', $article);
         $response->assertCreated()
             ->assertHeader('Location', $route)
             ->assertExactJson([
-                'data' => array_merge(
-                    ['id' => (string) $article->getRouteKey()],
-                    $data,
-                    ['links' => ['self' => $route]],
-                ),
+                'data' => [
+                    'type' => 'articles',
+                    'id' => (string) $article->getRouteKey(),
+                    'attributes' => $attributes,
+                    'links' => ['self' => $route],
+                ],
             ]);
     }
 
     public function test_title_is_required(): void
     {
         $this->postJsonApi(route('api.v1.articles.store'), [
-            'data' => [
-                'type' => 'articles',
-                'attributes' => [
-                    'content' => 'Content',
-                    'slug' => 'slug',
-                ],
-            ],
+            'content' => 'Content',
+            'slug' => 'slug',
         ])
             ->assertJsonApiValidationErrors('title');
     }
@@ -55,13 +48,8 @@ class CreateArticlesTest extends TestCase
     public function test_content_is_required(): void
     {
         $this->postJsonApi(route('api.v1.articles.store'), [
-            'data' => [
-                'type' => 'articles',
-                'attributes' => [
-                    'title' => 'Title',
-                    'slug' => 'slug',
-                ],
-            ],
+            'title' => 'Title',
+            'slug' => 'slug',
         ])
             ->assertJsonApiValidationErrors('content');
     }
