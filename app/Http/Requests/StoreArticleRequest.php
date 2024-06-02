@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
 class StoreArticleRequest extends FormRequest
 {
@@ -25,7 +27,11 @@ class StoreArticleRequest extends FormRequest
         return [
             'data.attributes.title' => ['required'],
             'data.attributes.content' => ['required'],
-            'data.attributes.slug' => ['required'],
+            'data.attributes.slug' => [
+                'required',
+                new Slug,
+                Rule::unique('articles', 'slug')->ignore($this->route('article')),
+            ],
         ];
     }
 

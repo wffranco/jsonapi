@@ -54,4 +54,9 @@ class Article extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

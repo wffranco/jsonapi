@@ -53,4 +53,80 @@ class CreateArticlesTest extends TestCase
         ])
             ->assertJsonApiValidationErrors('content');
     }
+
+    public function test_slug_is_unique_on_create(): void
+    {
+        $article = Article::factory()->create();
+
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => $article->slug,
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_be_a_string(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 1,
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_not_start_with_a_hyphen(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => '-slug',
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_not_end_with_a_hyphen(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'slug-',
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_not_contain_consecutive_hyphens(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'slug--slug',
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_not_contain_invalid_characters(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'Invalid Slug',
+        ])
+            ->assertJsonApiValidationErrors('slug');
+    }
+
+    public function test_slug_must_match_a_valid_slug_pattern(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'valid-slug-01',
+        ])->assertCreated();
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => \Str::slug('-Make-a valid--slug from invalid^-'),
+        ])->assertCreated();
+    }
 }

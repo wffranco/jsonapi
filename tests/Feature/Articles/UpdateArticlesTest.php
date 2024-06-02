@@ -16,20 +16,21 @@ class UpdateArticlesTest extends TestCase
     public function test_can_update_articles(): void
     {
         $article = Article::factory()->create();
-        $route = route('api.v1.articles.show', $article);
 
         $attributes = [
             'title' => 'Title',
             'content' => 'Content',
             'slug' => 'slug',
         ];
+        $id = $attributes['slug'];
+        $route = route('api.v1.articles.show', ['article' => $id]);
         $this->patchJsonApi(route('api.v1.articles.update', $article), $attributes)
             ->assertOk()
             ->assertHeader('Location', $route)
             ->assertExactJson([
                 'data' => [
                     'type' => 'articles',
-                    'id' => (string) $article->getRouteKey(),
+                    'id' => $id,
                     'attributes' => $attributes,
                     'links' => ['self' => $route],
                 ],
@@ -54,5 +55,25 @@ class UpdateArticlesTest extends TestCase
             'slug' => 'slug',
         ])
             ->assertJsonApiValidationErrors('content');
+    }
+
+    public function test_slug_is_unique(): void
+    {
+        $article1 = Article::factory()->create();
+        $article2 = Article::factory()->create(['slug' => 'slug']);
+
+        $this->patchJsonApi(route('api.v1.articles.update', $article1), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'slug',
+        ])
+            ->assertJsonApiValidationErrors('slug');
+
+        $this->patchJsonApi(route('api.v1.articles.update', $article2), [
+            'title' => 'Title new',
+            'content' => 'Content new',
+            'slug' => 'slug',
+        ])
+            ->assertOk();
     }
 }
