@@ -15,11 +15,14 @@ class ArticleController extends Controller
     public function index(Request $request): ArticleCollection
     {
         $articles = Article::query()
-            ->when($request->has('sort'), function ($query) use ($request) {
-                $sort = $request->get('sort');
-                $direction = $sort[0] === '-' ? 'desc' : 'asc';
-                $field = ltrim($sort, '-');
-                $query->orderBy($field, $direction);
+            ->when($request->filled('sort'), function ($query) use ($request) {
+                $allowedFields = ['title', 'content'];
+                foreach (explode(',', $request->get('sort')) as $sort) {
+                    $field = ltrim($sort, '-');
+                    abort_unless(in_array($field, $allowedFields), 400, "Invalid sort field: sort.{$field}");
+                    $direction = $sort[0] === '-' ? 'desc' : 'asc';
+                    $query->orderBy($field, $direction);
+                }
             })
             ->get();
 

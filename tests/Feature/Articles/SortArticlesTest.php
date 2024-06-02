@@ -60,4 +60,37 @@ class SortArticlesTest extends TestCase
             ->assertOk()
             ->assertSeeInOrder($contents);
     }
+
+    public function test_can_sort_articles_by_title_and_content(): void
+    {
+        $items = collect([]);
+        foreach (['B', 'A', 'C'] as $t) {
+            foreach (['C', 'A', 'B'] as $c) {
+                $item = ['title' => "$t Title", 'content' => "$c Content"];
+                Article::factory()->create($item);
+                $items->push($item);
+            }
+        }
+
+        // test with different orders
+        foreach (['asc', 'desc'] as $titleOrder) {
+            foreach (['asc', 'desc'] as $contentOrder) {
+                $sortedItems = $items->sortBy([['title', $titleOrder], ['content', $contentOrder]]);
+                $sort = ($titleOrder === 'asc' ? '' : '-').'title,'.($contentOrder === 'asc' ? '' : '-').'content';
+                $this->getJsonApi(route('api.v1.articles.index', ['sort' => $sort]))
+                    ->assertOk()
+                    ->assertSeeInOrder($sortedItems->pluck('title')->toArray())
+                    ->assertSeeInOrder($sortedItems->pluck('content')->toArray());
+            }
+        }
+    }
+
+    public function test_cannot_sort_articles_by_unknown_field(): void
+    {
+        Article::factory()->create();
+
+        $this->getJsonApi(route('api.v1.articles.index', ['sort' => 'unknown']))
+            ->assertStatus(400)
+            ->assertSee('sort.unknown');
+    }
 }
