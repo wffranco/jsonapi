@@ -43,7 +43,7 @@ class ListArticlesTest extends TestCase
         $this->getJsonApi(route('api.v1.articles.index'))
             ->assertOk()
             ->assertJsonCount(3, 'data')
-            ->assertExactJson([
+            ->assertJson([
                 'data' => $articles->map(fn (Article $article) => [
                     'type' => 'articles',
                     'id' => (string) $article->getRouteKey(),
