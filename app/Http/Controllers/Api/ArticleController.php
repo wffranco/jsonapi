@@ -7,13 +7,23 @@ use App\Http\Requests\StoreArticleRequest;
 use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ArticleController extends Controller
 {
-    public function index(): ArticleCollection
+    public function index(Request $request): ArticleCollection
     {
-        return ArticleCollection::make(Article::all());
+        $articles = Article::query()
+            ->when($request->has('sort'), function ($query) use ($request) {
+                $sort = $request->get('sort');
+                $direction = $sort[0] === '-' ? 'desc' : 'asc';
+                $field = ltrim($sort, '-');
+                $query->orderBy($field, $direction);
+            })
+            ->get();
+
+        return ArticleCollection::make($articles);
     }
 
     public function show(Article $article): ArticleResource
