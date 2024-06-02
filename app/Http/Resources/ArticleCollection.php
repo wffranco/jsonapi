@@ -20,7 +20,7 @@ class ArticleCollection extends ResourceCollection
         return [
             'data' => $this->collection,
             'links' => [
-                'self' => route('api.v1.articles.index'),
+                'self' => route('api.v1.articles.index', $request->query()),
             ],
         ];
     }
