@@ -102,4 +102,57 @@ class PaginateArticlesTest extends TestCase
             }
         }
     }
+
+    public function test_can_paginate_filtered_articles()
+    {
+        Article::factory()->create(['title' => 'Title 1']);
+        Article::factory()->create(['title' => 'Title 3']);
+        Article::factory()->create(['title' => 'Title 5']);
+        Article::factory()->count(2)->create(['title' => 'Something else']);
+        Article::factory()->create(['title' => 'Title 2']);
+        Article::factory()->create(['title' => 'Title 4']);
+        Article::factory()->create(['title' => 'Title 6']);
+        $url = route('api.v1.articles.index', [
+            'filter[title]' => 'Title',
+            'page' => ['size' => 2, 'number' => 2],
+        ]);
+
+        $response = $this->getJsonApi($url);
+        $response->assertJsonCount(2, 'data');
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'type',
+                    'id',
+                    'attributes' => ['title', 'content', 'slug'],
+                    'links' => ['self'],
+                ],
+            ],
+            'links' => ['first', 'last', 'prev', 'next'],
+        ]);
+        $response->assertSee([
+            'Title 2',
+            'Title 5',
+        ]);
+        $response->assertDontSee([
+            'Title 1',
+            'Title 3',
+            'Title 4',
+            'Title 6',
+            'Something else',
+        ]);
+
+        $links = [
+            'first' => ['page[number]=1', 'page[size]=2', 'filter[title]=Title'],
+            'last' => ['page[number]=3', 'page[size]=2', 'filter[title]=Title'],
+            'prev' => ['page[number]=1', 'page[size]=2', 'filter[title]=Title'],
+            'next' => ['page[number]=3', 'page[size]=2', 'filter[title]=Title'],
+        ];
+        foreach ($links as $name => $validations) {
+            $link = urldecode($response->json("links.{$name}"));
+            foreach ($validations as $validation) {
+                $this->assertStringContainsString($validation, $link);
+            }
+        }
+    }
 }

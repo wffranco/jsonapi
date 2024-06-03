@@ -12,6 +12,20 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class JsonApiEloquentBuilderMixin
 {
+    public function filterableBy()
+    {
+        return function (array $allowed = []): Builder {
+            return $this->when(request()->filled('filter'), function (Builder $query) use ($allowed) {
+                foreach (request('filter') as $field => $value) {
+                    abort_unless(in_array($field, $allowed), 400, "Filter not allowed: filter.{$field}");
+                    $query->hasNamedScope($field)
+                        ? $query->{$field}($value)
+                        : $query->where($field, 'like', '%'.$value.'%');
+                }
+            });
+        };
+    }
+
     public function paginated()
     {
         return function (array|string|null $appends = null): LengthAwarePaginator {
