@@ -14,7 +14,22 @@ class ArticleController extends Controller
 {
     public function index(Request $request): ArticleCollection
     {
+        $allowedFilters = ['title', 'content', 'year', 'month', 'day'];
         $articles = Article::query()
+            ->when(request()->filled('filter'), function ($query) use ($allowedFilters) {
+                foreach (request('filter') as $field => $value) {
+                    abort_unless(in_array($field, $allowedFilters), 400, "Filter not allowed: filter.{$field}");
+                    if ($field === 'year') {
+                        $query->whereYear('created_at', $value);
+                    } elseif ($field === 'month') {
+                        $query->whereMonth('created_at', $value);
+                    } elseif ($field === 'day') {
+                        $query->whereDay('created_at', $value);
+                    } else {
+                        $query->where($field, 'like', '%'.$value.'%');
+                    }
+                }
+            })
             ->sortableBy(['title', 'content'])
             ->paginated('sort');
 
