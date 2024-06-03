@@ -15,6 +15,7 @@ class ArticleController extends Controller
     public function index(Request $request): ArticleCollection
     {
         $articles = Article::query()
+            ->sparseFields(['title', 'content', 'slug'])
             ->filterableBy(['title', 'content', 'year', 'month', 'day'])
             ->sortableBy(['title', 'content'])
             ->paginated(['sort', 'filter']);

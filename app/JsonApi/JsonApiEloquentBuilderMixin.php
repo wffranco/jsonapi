@@ -43,12 +43,32 @@ class JsonApiEloquentBuilderMixin
     {
         return function (array $allowed = []): Builder {
             return $this->when(request()->filled('sort'), function (Builder $query) use ($allowed) {
-                foreach (explode(',', request()->get('sort')) as $sort) {
+                $sortFields = explode(',', request('sort'));
+                $notAllowed = collect($sortFields)->map(fn ($sort) => ltrim($sort, '-'))->diff($allowed)->map(fn ($field) => "sort.{$field}");
+                abort_unless($notAllowed->isEmpty(), 400, 'Invalid sort fields: '.$notAllowed->implode(', '));
+                foreach ($sortFields as $sort) {
                     $field = ltrim($sort, '-');
-                    abort_unless(in_array($field, $allowed), 400, "Invalid sort field: sort.{$field}");
                     $direction = $sort[0] === '-' ? 'desc' : 'asc';
                     $query->orderBy($field, $direction);
                 }
+            });
+        };
+    }
+
+    public function sparseFields()
+    {
+        return function (array $allowed = []): Builder {
+            $type = 'articles';
+
+            return $this->when(request()->filled("fields.{$type}"), function (Builder $query) use ($allowed, $type) {
+                $group = request("fields.{$type}");
+                $fields = explode(',', $group);
+                if (! in_array('slug', $fields)) {
+                    $fields[] = 'slug';
+                }
+                $notAllowed = collect($fields)->diff($allowed)->map(fn ($field) => "fields.{$type}.{$field}");
+                abort_unless($notAllowed->isEmpty(), 400, 'Invalid fields requested: '.$notAllowed->implode(', '));
+                $query->addSelect($fields);
             });
         };
     }

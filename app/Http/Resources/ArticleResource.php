@@ -17,14 +17,16 @@ class ArticleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fields = $request->filled('fields.articles') ? explode(',', data_get($request, 'fields.articles')) : null;
+
         return [
             'type' => 'articles',
             'id' => (string) $this->resource->getRouteKey(),
-            'attributes' => [
+            'attributes' => array_filter([
                 'title' => $this->resource->title,
                 'content' => $this->resource->content,
                 'slug' => $this->resource->slug,
-            ],
+            ], fn ($key) => ! $fields ? true : in_array($key, $fields), ARRAY_FILTER_USE_KEY),
             'links' => [
                 'self' => route('api.v1.articles.show', $this->resource),
             ],
