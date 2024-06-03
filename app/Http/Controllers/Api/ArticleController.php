@@ -16,13 +16,7 @@ class ArticleController extends Controller
     {
         $articles = Article::query()
             ->sortableBy(['title', 'content'])
-            ->paginate(
-                perPage: data_get($request, 'page.size', $size ?? 15),
-                pageName: 'page[number]',
-                page: data_get($request, 'page.number', $page ?? 1),
-            )
-            ->appends($request->only('page.size'))
-            ->appends($request->only('sort'));
+            ->paginated('sort');
 
         return ArticleCollection::make($articles);
     }

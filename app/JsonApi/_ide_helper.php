@@ -5,24 +5,24 @@
 **/
 
 namespace Illuminate\Database\Eloquent {
-    /**
-     * @see \App\JsonApi\ServiceProvider
-     */
+    use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
     class Builder extends \Illuminate\Database\Eloquent\Builder {
-        public function sortableBy(array $allowed = []) { return $this; }
+        private static \App\JsonApi\JsonApiEloquentBuilderMixin $mixin;
+        /** @return static|LengthAwarePaginator */ public function paginated(array|string|null $appends = null) { return static::$mixin->paginated()($appends); }
+        /** @return static */ public function sortableBy(array $allowed = []) { return static::$mixin->sortableBy()($allowed); }
     }
 
     abstract class Model extends \Illuminate\Database\Eloquent\Model {
-        /** @var \Illuminate\Database\Eloquent\Builder $builder */ private $builder;
+        private static Builder $builder;
+        /** @return static|LengthAwarePaginator */ public static function paginated(array|string|null $appends = null) { return static::$builder->paginated($appends); }
         /** @return static */ public static function sortableBy(array $allowed = []) { return static::$builder->sortableBy($allowed); }
     }
 }
 
 namespace Illuminate\Testing {
-    /**
-     * @see \App\JsonApi\Tests\MakesJsonApiRequests
-     *
-     * @method static assertJsonApiValidationErrors(string $attribute)
-     */
-    class TestResponse {}
+    class TestResponse extends \Illuminate\Testing\TestResponse {
+        private static \App\JsonApi\JsonApiTestResponseMixin $mixin;
+        public function assertJsonApiValidationErrors(string $attribute) { return static::$mixin->assertJsonApiValidationErrors()($attribute); }
+    }
 }
