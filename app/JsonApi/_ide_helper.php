@@ -10,6 +10,7 @@ namespace Illuminate\Database\Eloquent {
     class Builder extends \Illuminate\Database\Eloquent\Builder {
         private static \App\JsonApi\JsonApiEloquentBuilderMixin $mixin;
         /** @return static */ public function filterableBy(array $allowed = []) { return static::$mixin->filterableBy()($allowed); }
+        /** @return string */ public function getResourceType() { return static::$mixin->getResourceType()(); }
         /** @return static|LengthAwarePaginator */ public function paginated(array|string|null $appends = null) { return static::$mixin->paginated()($appends); }
         /** @return static */ public function sortableBy(array $allowed = []) { return static::$mixin->sortableBy()($allowed); }
         /** @return static */ public function sparseFields(array $allowed = []) { return static::$mixin->sparseFields()($allowed); }
@@ -18,6 +19,7 @@ namespace Illuminate\Database\Eloquent {
     abstract class Model extends \Illuminate\Database\Eloquent\Model {
         private static Builder $builder;
         /** @return static */ public static function filterableBy(array $allowed = []) { return static::$builder->filterableBy($allowed); }
+        /** @return string */ public static function getResourceType() { return static::$builder->getResourceType(); }
         /** @return static|LengthAwarePaginator */ public static function paginated(array|string|null $appends = null) { return static::$builder->paginated($appends); }
         /** @return static */ public static function sortableBy(array $allowed = []) { return static::$builder->sortableBy($allowed); }
         /** @return static */ public static function sparseFields(array $allowed = []) { return static::$builder->sparseFields($allowed); }

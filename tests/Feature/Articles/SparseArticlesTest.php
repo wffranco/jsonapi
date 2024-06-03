@@ -61,4 +61,52 @@ class SparseArticlesTest extends TestCase
                 'slug' => null,
             ]);
     }
+
+    public function test_cannot_sparse_fields_not_allowed_in_articles_index()
+    {
+        Article::factory()->create();
+
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'fields' => ['articles' => 'title,slug,foo'],
+        ]))->assertStatus(400);
+    }
+
+    public function test_fields_can_be_sparsed_in_articles_show()
+    {
+        $article = Article::factory()->create();
+
+        $this->getJsonApi(route('api.v1.articles.show', [
+            'article' => $article,
+            'fields' => ['articles' => 'title,slug'],
+        ]))
+            ->assertJson([
+                'data' => [
+                    'type' => 'articles',
+                    'id' => (string) $article->getRouteKey(),
+                    'attributes' => [
+                        'title' => $article->title,
+                        'slug' => $article->slug,
+                    ],
+                    'links' => [
+                        'self' => route('api.v1.articles.show', $article),
+                    ],
+                ],
+            ])
+            ->assertJsonMissing([
+                'content' => $article->content,
+            ])
+            ->assertJsonMissing([
+                'content' => null,
+            ]);
+    }
+
+    public function test_cannot_sparse_fields_not_allowed_in_articles_show()
+    {
+        $article = Article::factory()->create();
+
+        $this->getJsonApi(route('api.v1.articles.show', [
+            'article' => $article,
+            'fields' => ['articles' => 'title,slug,foo'],
+        ]))->assertStatus(400);
+    }
 }

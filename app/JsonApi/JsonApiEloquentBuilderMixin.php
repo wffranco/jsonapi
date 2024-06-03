@@ -26,6 +26,18 @@ class JsonApiEloquentBuilderMixin
         };
     }
 
+    public function getResourceType()
+    {
+        return function (): string {
+            $model = $this->getModel();
+            if (method_exists($model, 'getResourceType')) {
+                return $model->getResourceType();
+            }
+
+            return $model?->resourceType ?? $model->getTable();
+        };
+    }
+
     public function paginated()
     {
         return function (array|string|null $appends = null): LengthAwarePaginator {
@@ -58,14 +70,18 @@ class JsonApiEloquentBuilderMixin
     public function sparseFields()
     {
         return function (array $allowed = []): Builder {
-            $type = 'articles';
-
-            return $this->when(request()->filled("fields.{$type}"), function (Builder $query) use ($allowed, $type) {
+            return $this->when(request()->filled('fields'), function (Builder $query) use ($allowed) {
+                $type = $query->getResourceType();
                 $group = request("fields.{$type}");
-                $fields = explode(',', $group);
-                if (! in_array('slug', $fields)) {
-                    $fields[] = 'slug';
+                if (empty($group)) {
+                    return;
                 }
+                $fields = explode(',', $group);
+                $routeKeyName = $query->getModel()->getRouteKeyName();
+                if (! in_array($routeKeyName, $fields)) {
+                    $fields[] = $routeKeyName;
+                }
+
                 $notAllowed = collect($fields)->diff($allowed)->map(fn ($field) => "fields.{$type}.{$field}");
                 abort_unless($notAllowed->isEmpty(), 400, 'Invalid fields requested: '.$notAllowed->implode(', '));
                 $query->addSelect($fields);
