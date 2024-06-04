@@ -42,14 +42,14 @@ abstract class JsonApiResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'type' => $this->resource->getResourceType(),
-            'id' => (string) $this->resource->getRouteKey(),
-            'attributes' => $this->filteredAttributes($request),
-            'links' => [
+        return JsonApiDocument::make()
+            ->type($this->resource->getResourceType())
+            ->id($this->resource->getRouteKey())
+            ->attributes($this->filteredAttributes($request))
+            ->links([
                 'self' => $this->selfLink(),
-            ],
-        ];
+            ])
+            ->get('data');
     }
 
     public function withResponse(Request $request, JsonResponse $response)

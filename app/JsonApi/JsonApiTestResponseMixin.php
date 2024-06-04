@@ -144,13 +144,13 @@ class JsonApiTestResponseMixin
 
     private function parseJsonApiResource()
     {
-        return fn (Model $model, array $attributeKeys = []): array => [
-            'type' => $model->getResourceType(),
-            'id' => (string) $model->getRouteKey(),
-            'attributes' => array_combine($attributeKeys, array_map(fn ($key) => $model->{$key}, $attributeKeys)) ?: $model->attributesToArray(),
-            'links' => [
+        return fn (Model $model, array $attributeKeys = []): array => JsonApiDocument::make()
+            ->type($model->getResourceType())
+            ->id($model->getRouteKey())
+            ->attributes($model->only($attributeKeys))
+            ->links([
                 'self' => route('api.v1.'.$model->getResourceType().'.show', $model),
-            ],
-        ];
+            ])
+            ->get('data');
     }
 }
