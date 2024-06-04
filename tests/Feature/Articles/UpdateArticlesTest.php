@@ -17,24 +17,14 @@ class UpdateArticlesTest extends TestCase
     {
         $article = Article::factory()->create();
 
-        $attributes = [
+        $this->patchJsonApi(route('api.v1.articles.update', $article), [
             'title' => 'Title',
             'content' => 'Content',
             'slug' => 'slug',
-        ];
-        $id = $attributes['slug'];
-        $route = route('api.v1.articles.show', ['article' => $id]);
-        $this->patchJsonApi(route('api.v1.articles.update', $article), $attributes)
+        ])
             ->assertOk()
-            ->assertHeader('Location', $route)
-            ->assertExactJson([
-                'data' => [
-                    'type' => 'articles',
-                    'id' => $id,
-                    'attributes' => $attributes,
-                    'links' => ['self' => $route],
-                ],
-            ]);
+            ->assertJsonApiHeaderLocation($article->refresh())
+            ->assertJsonApiResource($article, ['title', 'content', 'slug']);
     }
 
     public function test_title_is_required(): void
@@ -57,22 +47,23 @@ class UpdateArticlesTest extends TestCase
             ->assertJsonApiValidationErrors('content');
     }
 
-    public function test_slug_is_unique(): void
+    public function test_slug_is_unique_on_update(): void
     {
-        $article1 = Article::factory()->create();
-        $article2 = Article::factory()->create(['slug' => 'slug']);
+        $articles = Article::factory()->count(2)->create();
 
-        $this->patchJsonApi(route('api.v1.articles.update', $article1), [
+        // Slug can't be stored in another article
+        $this->patchJsonApi(route('api.v1.articles.update', $articles[0]), [
             'title' => 'Title',
             'content' => 'Content',
-            'slug' => 'slug',
+            'slug' => $articles[1]->slug,
         ])
             ->assertJsonApiValidationErrors('slug');
 
-        $this->patchJsonApi(route('api.v1.articles.update', $article2), [
+        // Slug can be overridden by the same article
+        $this->patchJsonApi(route('api.v1.articles.update', $articles[0]), [
             'title' => 'Title new',
             'content' => 'Content new',
-            'slug' => 'slug',
+            'slug' => $articles[0]->slug,
         ])
             ->assertOk();
     }

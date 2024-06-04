@@ -27,8 +27,34 @@ namespace Illuminate\Database\Eloquent {
 }
 
 namespace Illuminate\Testing {
+    use Illuminate\Database\Eloquent\Collection;
+    use Illuminate\Database\Eloquent\Model;
+
     class TestResponse extends \Illuminate\Testing\TestResponse {
         private static \App\JsonApi\JsonApiTestResponseMixin $mixin;
-        public function assertJsonApiValidationErrors(string $attribute) { return static::$mixin->assertJsonApiValidationErrors()($attribute); }
+        /** @return static */
+        public function assertJsonApiCollection(Collection $collection, array $attributeKeys, array $missingKeys = [])
+        { return static::$mixin->assertJsonApiCollection()($collection, $attributeKeys, $missingKeys); }
+        /** @return static */
+        public function assertJsonApiCollectionStructure(array $attributeKeys = [])
+        { return static::$mixin->assertJsonApiCollectionStructure()($attributeKeys); }
+        /** @return static */
+        public function assertJsonApiHeaderContentType()
+        { return static::$mixin->assertJsonApiHeaderContentType()(); }
+        /** @return static */
+        public function assertJsonApiHeaderLocation($model)
+        { return static::$mixin->assertJsonApiHeaderLocation()($model); }
+        /** @return static */
+        public function assertJsonApiMissingAttributes(Model $model, array $attributeKeys)
+        { return static::$mixin->assertJsonApiMissingAttributes()($model, $attributeKeys); }
+        /** @return static */
+        public function assertJsonApiResource(Model $model, array $attributeKeys = [], array $missingKeys = [])
+        { return static::$mixin->assertJsonApiResource()($model, $attributeKeys, $missingKeys); }
+        /** @return static */
+        public function assertJsonApiResourceStructure(array $attributeKeys = [])
+        { return static::$mixin->assertJsonApiResourceStructure()($attributeKeys); }
+        /** @return static */
+        public function assertJsonApiValidationErrors(string $attribute)
+        { return static::$mixin->assertJsonApiValidationErrors()($attribute); }
     }
 }

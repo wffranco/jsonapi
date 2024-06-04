@@ -13,71 +13,56 @@ class SortArticlesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_sort_articles_by_title_asc(): void
+    protected function setUp(): void
     {
-        $titles = ['A Title', 'B Title', 'C Title'];
-        Article::factory()->create(['title' => $titles[2]]);
-        Article::factory()->create(['title' => $titles[0]]);
-        Article::factory()->create(['title' => $titles[1]]);
+        parent::setUp();
 
+        foreach (['C', 'A', 'B'] as $t) {
+            foreach (['B', 'A', 'C'] as $c) {
+                $item = ['title' => "$t$c Title", 'content' => "$c$t Content"];
+                Article::factory()->create($item);
+            }
+        }
+    }
+
+    public function test_can_sort_articles_by_title(): void
+    {
+        $titles = Article::orderBy('title')->select('title')->pluck('title')->toArray();
+
+        // Sort by title ascending
         $this->getJsonApi(route('api.v1.articles.index', ['sort' => 'title']))
             ->assertOk()
             ->assertSeeInOrder($titles);
-    }
-
-    public function test_can_sort_articles_by_title_desc(): void
-    {
-        $titles = ['C Title', 'B Title', 'A Title'];
-        Article::factory()->create(['title' => $titles[2]]);
-        Article::factory()->create(['title' => $titles[0]]);
-        Article::factory()->create(['title' => $titles[1]]);
-
+        // Sort by title descending
         $this->getJsonApi(route('api.v1.articles.index', ['sort' => '-title']))
             ->assertOk()
-            ->assertSeeInOrder($titles);
+            ->assertSeeInOrder(array_reverse($titles));
     }
 
-    public function test_can_sort_articles_by_content_asc(): void
+    public function test_can_sort_articles_by_content(): void
     {
-        $contents = ['A Content', 'B Content', 'C Content'];
-        Article::factory()->create(['content' => $contents[2]]);
-        Article::factory()->create(['content' => $contents[0]]);
-        Article::factory()->create(['content' => $contents[1]]);
+        $contents = Article::orderBy('content')->select('content')->pluck('content')->toArray();
 
+        // Sort by content ascending
         $this->getJsonApi(route('api.v1.articles.index', ['sort' => 'content']))
             ->assertOk()
             ->assertSeeInOrder($contents);
-    }
-
-    public function test_can_sort_articles_by_content_desc(): void
-    {
-        $contents = ['C Content', 'B Content', 'A Content'];
-        Article::factory()->create(['content' => $contents[2]]);
-        Article::factory()->create(['content' => $contents[0]]);
-        Article::factory()->create(['content' => $contents[1]]);
-
+        // Sort by content descending
         $this->getJsonApi(route('api.v1.articles.index', ['sort' => '-content']))
             ->assertOk()
-            ->assertSeeInOrder($contents);
+            ->assertSeeInOrder(array_reverse($contents));
     }
 
     public function test_can_sort_articles_by_title_and_content(): void
     {
-        $items = collect([]);
-        foreach (['B', 'A', 'C'] as $t) {
-            foreach (['C', 'A', 'B'] as $c) {
-                $item = ['title' => "$t Title", 'content' => "$c Content"];
-                Article::factory()->create($item);
-                $items->push($item);
-            }
-        }
+        $items = Article::all(['title', 'content'])->map(fn ($item) => $item->only('title', 'content'));
 
-        // test with different orders
-        foreach (['asc', 'desc'] as $titleOrder) {
-            foreach (['asc', 'desc'] as $contentOrder) {
-                $sortedItems = $items->sortBy([['title', $titleOrder], ['content', $contentOrder]]);
-                $sort = ($titleOrder === 'asc' ? '' : '-').'title,'.($contentOrder === 'asc' ? '' : '-').'content';
-                $this->getJsonApi(route('api.v1.articles.index', ['sort' => $sort]))
+        // Alternate sort orders for title and content
+        $rules = [['asc', ''], ['desc', '-']];
+        foreach ($rules as [$to, $th]) {
+            foreach ($rules as [$co, $ch]) {
+                $sortedItems = $items->sortBy([['title', $to], ['content', $co]]);
+                $this->getJsonApi(route('api.v1.articles.index', ['sort' => "{$th}title,{$ch}content"]))
                     ->assertOk()
                     ->assertSeeInOrder($sortedItems->pluck('title')->toArray())
                     ->assertSeeInOrder($sortedItems->pluck('content')->toArray());

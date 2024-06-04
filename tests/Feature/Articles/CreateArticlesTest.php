@@ -15,25 +15,14 @@ class CreateArticlesTest extends TestCase
 
     public function test_can_create_articles(): void
     {
-        $attributes = [
+        $this->postJsonApi(route('api.v1.articles.store'), [
             'title' => 'Title',
             'content' => 'Content',
             'slug' => 'slug',
-        ];
-        $response = $this->postJsonApi(route('api.v1.articles.store'), $attributes);
-
-        $article = Article::first();
-        $route = route('api.v1.articles.show', $article);
-        $response->assertCreated()
-            ->assertHeader('Location', $route)
-            ->assertExactJson([
-                'data' => [
-                    'type' => 'articles',
-                    'id' => (string) $article->getRouteKey(),
-                    'attributes' => $attributes,
-                    'links' => ['self' => $route],
-                ],
-            ]);
+        ])
+            ->assertCreated()
+            ->assertJsonApiHeaderLocation($article = Article::first())
+            ->assertJsonApiResource($article, ['title', 'content', 'slug']);
     }
 
     public function test_title_is_required(): void

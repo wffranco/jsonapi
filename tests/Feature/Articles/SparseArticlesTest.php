@@ -17,26 +17,8 @@ class SparseArticlesTest extends TestCase
         $this->getJsonApi(route('api.v1.articles.index', [
             'fields' => ['articles' => 'title,slug'],
         ]))
-            ->assertJsonStructure([
-                'data' => [
-                    '*' => [
-                        'type',
-                        'id',
-                        'attributes' => ['title', 'slug'],
-                        'links' => ['self'],
-                    ],
-                ],
-            ])
-            ->assertJsonFragment([
-                'title' => $article->title,
-                'slug' => $article->slug,
-            ])
-            ->assertJsonMissing([
-                'content' => $article->content,
-            ])
-            ->assertJsonMissing([
-                'content' => null,
-            ]);
+            ->assertJsonApiCollectionStructure(['title', 'slug'])
+            ->assertJsonApiCollection(Article::all(), ['title', 'slug'], ['content']);
     }
 
     public function test_route_key_is_always_included_in_articles_index()
@@ -46,20 +28,7 @@ class SparseArticlesTest extends TestCase
         $this->getJsonApi(route('api.v1.articles.index', [
             'fields' => ['articles' => 'title'],
         ]))
-            ->assertJsonFragment([
-                'id' => (string) $article->getRouteKey(),
-            ])
-            ->assertJsonFragment([
-                'title' => $article->title,
-            ])
-            ->assertJsonMissing([
-                'content' => $article->content,
-                'slug' => $article->slug,
-            ])
-            ->assertJsonMissing([
-                'content' => null,
-                'slug' => null,
-            ]);
+            ->assertJsonApiCollection(Article::all(), ['title'], ['slug', 'content']);
     }
 
     public function test_cannot_sparse_fields_not_allowed_in_articles_index()
@@ -79,25 +48,7 @@ class SparseArticlesTest extends TestCase
             'article' => $article,
             'fields' => ['articles' => 'title,slug'],
         ]))
-            ->assertJson([
-                'data' => [
-                    'type' => 'articles',
-                    'id' => (string) $article->getRouteKey(),
-                    'attributes' => [
-                        'title' => $article->title,
-                        'slug' => $article->slug,
-                    ],
-                    'links' => [
-                        'self' => route('api.v1.articles.show', $article),
-                    ],
-                ],
-            ])
-            ->assertJsonMissing([
-                'content' => $article->content,
-            ])
-            ->assertJsonMissing([
-                'content' => null,
-            ]);
+            ->assertJsonApiResource($article, ['title', 'slug'], ['content']);
     }
 
     public function test_cannot_sparse_fields_not_allowed_in_articles_show()

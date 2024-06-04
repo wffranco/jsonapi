@@ -10,6 +10,27 @@ use PHPUnit\Framework\ExpectationFailedException;
  */
 trait JsonApiRequests
 {
+    public function assertJsonApiPaginationLinks(TestResponse $response, int $number = 1, int $size = 15, array $queries = [], ?int $last = null, int $first = 1): static
+    {
+        $links = [
+            'first' => ['page[number]' => $first, 'page[size]' => $size],
+            'last' => ['page[number]' => $last, 'page[size]' => $size],
+            'prev' => ['page[number]' => $number === $first ? $first : $number - 1, 'page[size]' => $size],
+            'next' => ['page[number]' => $number === $last ? $last : $number + 1, 'page[size]' => $size],
+        ];
+        foreach ($links as $name => $query) {
+            $link = urldecode($response->json("links.{$name}"));
+            foreach ($query as $key => $value) {
+                $this->assertStringContainsString("{$key}={$value}", $link);
+                foreach ($queries as $query) {
+                    $this->assertStringContainsString($query, $link);
+                }
+            }
+        }
+
+        return $this;
+    }
+
     public function json($method, $uri, array $data = [], array $headers = [], $options = 0)
     {
         /** @var TestResponse $response */
