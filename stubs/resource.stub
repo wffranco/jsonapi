@@ -1,0 +1,19 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\ModelName;
+use App\JsonApi\JsonApiResource;
+use Illuminate\Http\Request;
+
+/**
+ * @extends JsonApiResource<ModelName>
+ */
+class {{ class }} extends JsonApiResource
+{
+    public function toAttributes(Request $request): array
+    {
+        return [
+        ];
+    }
+}
