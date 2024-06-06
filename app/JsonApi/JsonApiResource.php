@@ -17,7 +17,7 @@ abstract class JsonApiResource extends JsonResource
 {
     private string $selfLink;
 
-    abstract public function toAttributes(Request $request): array;
+    abstract public function allowedAttributes(): array;
 
     /**
      * @param  TModel|LengthAwarePaginator  $resources
@@ -42,10 +42,8 @@ abstract class JsonApiResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return JsonApiDocument::make()
-            ->type($this->resource->getResourceType())
-            ->id($this->resource->getRouteKey())
-            ->attributes($this->filteredAttributes($request))
+        return JsonApiDocument::make($this->resource)
+            ->attributes($this->filteredAttributes())
             ->links([
                 'self' => $this->selfLink(),
             ])
@@ -57,15 +55,14 @@ abstract class JsonApiResource extends JsonResource
         $response->withHeaders(['Location' => $this->selfLink()]);
     }
 
-    protected function filteredAttributes(Request $request): array
+    protected function filteredAttributes(): array
     {
         $type = $this->resource->getResourceType();
-        $fields = request()->filled("fields.{$type}") ? explode(',', request("fields.{$type}")) : null;
-        $attributes = $this?->toAttributes($request);
+        $fields = request()->filled("fields.{$type}") ? request("fields.{$type}") : null;
 
         return $fields
-            ? array_filter($attributes, fn ($key) => in_array($key, $fields), ARRAY_FILTER_USE_KEY)
-            : $attributes;
+            ? array_intersect(explode(',', $fields), $this->allowedAttributes())
+            : $this->allowedAttributes();
     }
 
     protected function selfLink(): string

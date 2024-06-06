@@ -12,13 +12,16 @@ class JsonApiTestResponseMixin
 {
     public function assertJsonApiCollection()
     {
-        $parseResourse = $this->parseJsonApiResource();
-
-        return function (Collection $collection, array $attributeKeys, array $missingKeys = []) use ($parseResourse): TestResponse {
+        return function (Collection $collection, array $attributeKeys, array $missingKeys = []): TestResponse {
             /** @var TestResponse $this */
             return $this->assertJsonApiCollectionStructure($attributeKeys)
                 ->assertJson([
-                    'data' => $collection->map(fn (Model $model) => $parseResourse($model, $attributeKeys))->all(),
+                    'data' => $collection->map(
+                        fn (Model $model) => JsonApiDocument::make($model)
+                            ->attributes($attributeKeys)
+                            ->links()
+                            ->get('data')
+                    )->all(),
                     'links' => [
                         'self' => route('api.v1.'.$collection[0]->getResourceType().'.index'),
                     ],
@@ -89,12 +92,12 @@ class JsonApiTestResponseMixin
 
     public function assertJsonApiResource()
     {
-        $parseResourse = $this->parseJsonApiResource();
-
-        return function (Model $model, array $attributeKeys = [], array $missingKeys = []) use ($parseResourse): TestResponse {
+        return function (Model $model, array $attributeKeys = [], array $missingKeys = []): TestResponse {
             /** @var TestResponse $this */
             return $this->assertJsonApiResourceStructure($attributeKeys)
-                ->assertJson(['data' => $parseResourse($model, $attributeKeys)])
+                ->assertJson([
+                    'data' => JsonApiDocument::make($model)->attributes($attributeKeys)->links()->get('data'),
+                ])
                 ->when(! empty($missingKeys), fn (TestResponse $response) => $response->assertJsonApiMissingAttributes($model, $missingKeys));
         };
     }
@@ -140,17 +143,5 @@ class JsonApiTestResponseMixin
 
             return $this->assertStatus(422);
         };
-    }
-
-    private function parseJsonApiResource()
-    {
-        return fn (Model $model, array $attributeKeys = []): array => JsonApiDocument::make()
-            ->type($model->getResourceType())
-            ->id($model->getRouteKey())
-            ->attributes($model->only($attributeKeys))
-            ->links([
-                'self' => route('api.v1.'.$model->getResourceType().'.show', $model),
-            ])
-            ->get('data');
     }
 }

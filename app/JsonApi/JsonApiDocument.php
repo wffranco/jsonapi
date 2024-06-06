@@ -4,23 +4,31 @@ namespace App\JsonApi;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class JsonApiDocument extends Dot\Collection
 {
+    protected ?Collection $collection = null;
+
     protected ?Model $model = null;
 
-    /** @param array|Model $items */
+    /** @param array|Model|Collection $items */
     public function __construct($items = [], ?Closure $onModel = null)
     {
         parent::__construct(is_array($items) ? $items : ['data' => []]);
-        if ($items instanceof Model) {
+        if ($items instanceof Collection) {
+            $this->collection = $items;
+            // format a collection of models
+            $this->put('data', $items->map(fn ($item) => static::make($item, $onModel)->get('data'))->all());
+        } elseif ($items instanceof Model) {
             $this->model = $items;
             // format a model
             $this->type()->id()->apply($onModel);
         }
     }
 
-    /** @param array|Model $items */
+    /** @param array|Model|Collection $items */
     public static function make($items = [], ?Closure $onModel = null): static
     {
         return new static($items, $onModel);
@@ -33,7 +41,9 @@ class JsonApiDocument extends Dot\Collection
 
     public function id(?string $id = null): static
     {
-        return $this->put('data.id', $id ?? $this->model?->getRouteKey());
+        $id = $id ?: $this->model?->getRouteKey();
+
+        return $this->put('data.id', is_null($id) ? null : (string) $id);
     }
 
     /**
@@ -60,9 +70,33 @@ class JsonApiDocument extends Dot\Collection
         return $this->put('data.attributes', $filter ? array_filter($attributes) : $attributes);
     }
 
-    public function links(array $links, string $field = 'data.links'): static
+    public function links(?array $links = null, string $prefix = 'data'): static
     {
-        return $this->put($field, $links);
+        $prefix .= $prefix ? '.' : '';
+        if (! empty($links)) {
+            $this->put("{$prefix}links", $links);
+        }
+        if ($this->isEmpty("{$prefix}links.self") && $this->has("{$prefix}type") && $this->has("{$prefix}id")) {
+            $this->put("{$prefix}links.self", route('api.v1.'.$this->get("{$prefix}type").'.show', $this->get("{$prefix}id")));
+        }
+
+        return $this;
+    }
+
+    public function relationships(?array $relationships = null, ?callable $onModel = null): static
+    {
+        if (is_null($relationships)) {
+            $relationships = $this?->model?->getRelations() ?? [];
+        }
+        foreach (Arr::undot($relationships) as $type => $relationship) {
+            $this->put("data.relationships.$type", match (true) {
+                $relationship instanceof Collection => $relationship->map(fn ($model) => static::make($model, $onModel))->all(),
+                $relationship instanceof Model => static::make($relationship, $onModel)->all(),
+                default => $relationship,
+            });
+        }
+
+        return $this;
     }
 
     public function apply(?callable $callback = null)
