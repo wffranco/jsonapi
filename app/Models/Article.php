@@ -5,12 +5,9 @@ namespace App\Models;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property int $category_id
- * @property int $user_id
  * @property string $title
  * @property string $content
  * @property string $slug
@@ -44,8 +41,6 @@ class Article extends Model
      * @var array
      */
     protected $fillable = [
-        'category_id',
-        'user_id',
         'title',
         'content',
         'slug',
@@ -58,17 +53,5 @@ class Article extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'category_id' => 'integer',
-        'user_id' => 'integer',
     ];
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }
