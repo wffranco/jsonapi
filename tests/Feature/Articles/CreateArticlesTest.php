@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,10 +16,16 @@ class CreateArticlesTest extends TestCase
 
     public function test_can_create_articles(): void
     {
+        $category = Category::factory()->create();
         $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'slug',
+            'attributes' => [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug',
+            ],
+            'relationships' => [
+                'category' => $category,
+            ],
         ])
             ->assertCreated()
             ->assertJsonApiHeaderLocation($article = Article::first())
@@ -107,15 +114,27 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_match_a_valid_slug_pattern(): void
     {
+        $category = Category::factory()->create();
+
         $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'valid-slug-01',
+            'attributes' => [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'valid-slug-01',
+            ],
+            'relationships' => [
+                'category' => $category,
+            ],
         ])->assertCreated();
         $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => \Str::slug('-Make-a valid--slug from invalid^-'),
+            'attributes' => [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => \Str::slug('-Make-a valid--slug from invalid^-'),
+            ],
+            'relationships' => [
+                'category' => $category,
+            ],
         ])->assertCreated();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
 use App\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
@@ -32,12 +33,18 @@ class StoreArticleRequest extends FormRequest
                 new Slug,
                 Rule::unique('articles', 'slug')->ignore($this->route('article')),
             ],
+            'data.relationships' => [],
         ];
     }
 
     public function validated($key = null, $default = null)
     {
         $validated = parent::validated('data', []);
+
+        $slug = Arr::get($validated, 'relationships.category.data.id');
+        if ($category = Category::where('slug', $slug)->first()) {
+            Arr::set($validated, 'attributes.category_id', $category->id);
+        }
 
         return Arr::get($validated, $key, $default);
     }

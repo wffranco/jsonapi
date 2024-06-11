@@ -48,11 +48,15 @@ trait JsonApiRequests
         $headers['Accept'] = 'application/vnd.api+json';
         if (! isset($data['data'])) {
             $segments = explode('/', (string) \Str::of(parse_url($uri, PHP_URL_PATH))->afterNext('api/v1/'));
-            $data = JsonApiDocument::make()
+            $document = JsonApiDocument::make()
                 ->type($segments[0] ?? null)
-                ->id($segments[1] ?? null)
-                ->attributes($data)
-                ->all();
+                ->id($segments[1] ?? null);
+            if (isset($data['attributes'])) {
+                $document->attributes($data['attributes'], false)->relationships($data['relationships'] ?? null);
+            } else {
+                $document->attributes($data, false);
+            }
+            $data = $document->all();
         }
 
         return $this->json($method, $uri, $data, $headers, $options);

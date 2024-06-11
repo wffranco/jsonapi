@@ -6,16 +6,17 @@ use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
+ * @property int $category_id
  * @property string $title
  * @property string $content
  * @property string $slug
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property-read Category $category
- * @property-read User $user
  *
  * @method static ArticleFactory<static> factory($count = null, $state = [])
  * @method static static newModelQuery()
@@ -47,6 +48,7 @@ class Article extends Model
      * @var array
      */
     protected $fillable = [
+        'category_id',
         'title',
         'content',
         'slug',
@@ -59,11 +61,17 @@ class Article extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'category_id' => 'integer',
     ];
 
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     /** @param static $query */
