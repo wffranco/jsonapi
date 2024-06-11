@@ -54,7 +54,7 @@ namespace Illuminate\Testing {
         public function assertJsonApiResourceStructure(array $attributeKeys = [])
         { return static::$mixin->assertJsonApiResourceStructure()($attributeKeys); }
         /** @return static */
-        public function assertJsonApiValidationErrors(string $attribute)
-        { return static::$mixin->assertJsonApiValidationErrors()($attribute); }
+        public function assertJsonApiValidationErrors(string $attribute, bool $raw = false)
+        { return static::$mixin->assertJsonApiValidationErrors()($attribute, $raw); }
     }
 }

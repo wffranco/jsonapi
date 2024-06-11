@@ -33,7 +33,10 @@ class StoreArticleRequest extends FormRequest
                 new Slug,
                 Rule::unique('articles', 'slug')->ignore($this->route('article')),
             ],
-            'data.relationships' => [],
+            'data.relationships.category.data.id' => [
+                Rule::requiredIf(! $this->route('article')),
+                Rule::exists('categories', 'slug'),
+            ],
         ];
     }
 

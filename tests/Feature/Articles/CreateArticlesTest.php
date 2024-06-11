@@ -50,6 +50,34 @@ class CreateArticlesTest extends TestCase
             ->assertJsonApiValidationErrors('content');
     }
 
+    public function test_article_category_relationship_is_required(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'title' => 'Title',
+            'content' => 'Content',
+            'slug' => 'slug',
+        ])->assertJsonApiValidationErrors('relationships.category');
+    }
+
+    public function test_article_category_must_exist(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'), [
+            'attributes' => [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug',
+            ],
+            'relationships' => [
+                'category' => [
+                    'data' => [
+                        'type' => 'categories',
+                        'id' => 'any-id',
+                    ],
+                ],
+            ],
+        ])->assertJsonApiValidationErrors('relationships.category');
+    }
+
     public function test_slug_is_unique_on_create(): void
     {
         $article = Article::factory()->create();

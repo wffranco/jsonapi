@@ -118,10 +118,14 @@ class JsonApiTestResponseMixin
 
     public function assertJsonApiValidationErrors()
     {
-        return function (string $attribute): TestResponse {
+        return function (string $attribute, bool $raw = false): TestResponse {
             /** @var TestResponse $this */
             try {
-                if (! \Str::startsWith($attribute, 'data')) {
+                if ($raw) {
+                    // The attribute is already in the correct format
+                } elseif (\Str::startsWith($attribute, 'relationships')) {
+                    $attribute = "data.{$attribute}.data.id";
+                } elseif (! \Str::startsWith($attribute, 'data')) {
                     $attribute = "data.attributes.{$attribute}";
                 }
                 $this->assertJsonFragment([
