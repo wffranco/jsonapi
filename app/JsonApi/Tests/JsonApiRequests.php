@@ -52,7 +52,7 @@ trait JsonApiRequests
                 ->type($segments[0] ?? null)
                 ->id($segments[1] ?? null);
             if (isset($data['attributes'])) {
-                $document->attributes($data['attributes'], false)->relationships($data['relationships'] ?? null);
+                $document->attributes($data['attributes'], false)->relationshipData($data['relationships'] ?? null);
             } else {
                 $document->attributes($data, false);
             }

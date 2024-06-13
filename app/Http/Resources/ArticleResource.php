@@ -14,4 +14,9 @@ class ArticleResource extends JsonApiResource
     {
         return ['title', 'content', 'slug'];
     }
+
+    public function getRelationshipKeys(): array
+    {
+        return ['category'];
+    }
 }

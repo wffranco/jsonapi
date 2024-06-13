@@ -83,7 +83,7 @@ class JsonApiDocument extends Dot\Collection
         return $this;
     }
 
-    public function relationships(?array $relationships = null, ?callable $onModel = null): static
+    public function relationshipData(?array $relationships = null, ?callable $onModel = null): static
     {
         if (is_null($relationships)) {
             $relationships = $this?->model?->getRelations() ?? [];
@@ -94,6 +94,19 @@ class JsonApiDocument extends Dot\Collection
                 $relationship instanceof Model => static::make($relationship, $onModel)->all(),
                 default => $relationship,
             });
+        }
+
+        return $this;
+    }
+
+    public function relationshipsLinks(?array $relationships = null): static
+    {
+        if (is_null($relationships)) {
+            $relationships = array_keys($this->get('data.relationships'));
+        }
+        foreach ($relationships as $type) {
+            $this->unfilled('data.relationships.'.$type.'.links.self', route('api.v1.'.$this->get('data.type').'.relationships.'.$type, $this->get('data.id')));
+            $this->unfilled('data.relationships.'.$type.'.links.related', route('api.v1.'.$this->get('data.type').'.'.$type, $this->get('data.id')));
         }
 
         return $this;

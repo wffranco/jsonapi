@@ -116,6 +116,38 @@ class JsonApiTestResponseMixin
         };
     }
 
+    public function assertJsonApiRelationshipLinks()
+    {
+        return function (Model $model, array $relationshipKeys): TestResponse {
+            /** @var TestResponse $this */
+            foreach ($relationshipKeys as $type) {
+                try {
+                    $this->assertJson([
+                        'data' => [
+                            'relationships' => [
+                                $type => [
+                                    'links' => [
+                                        'self' => route("api.v1.{$model->getResourceType()}.relationships.{$type}", $model),
+                                        'related' => route("api.v1.{$model->getResourceType()}.{$type}", $model),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]);
+                } catch (ExpectationFailedException $e) {
+                    PHPUnit::fail(implode(PHP_EOL, [
+                        "Failed to find a valid JSON:API relationship links for '{$type}'.",
+                        'Be sure to include the `getRelationshipKeys` method in your resource class.',
+                        '',
+                        $e->getMessage(),
+                    ]));
+                }
+            }
+
+            return $this;
+        };
+    }
+
     public function assertJsonApiValidationErrors()
     {
         return function (string $attribute, bool $raw = false): TestResponse {

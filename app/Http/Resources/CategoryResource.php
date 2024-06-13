@@ -14,4 +14,9 @@ class CategoryResource extends JsonApiResource
     {
         return ['name', 'slug'];
     }
+
+    public function getRelationshipKeys(): array
+    {
+        return [];
+    }
 }

@@ -21,7 +21,7 @@ class DocumentTest extends TestCase
                 'name' => 'Name',
                 'alias' => 'alias',
             ])
-            ->relationships([
+            ->relationshipData([
                 'role' => [
                     'data' => [
                         'type' => 'roles',
@@ -76,7 +76,7 @@ class DocumentTest extends TestCase
 
         $document = JsonApiDocument::make($user)
             ->attributes()
-            ->relationships([
+            ->relationshipData([
                 'role' => $role,
             ])
             ->all();
@@ -112,7 +112,7 @@ class DocumentTest extends TestCase
                     'name' => 'Name',
                     'alias' => 'alias',
                 ])
-                ->relationships([
+                ->relationshipData([
                     'role' => [
                         'data' => [
                             'type' => 'roles',
@@ -128,7 +128,7 @@ class DocumentTest extends TestCase
                     'name' => 'Name',
                     'alias' => 'alias',
                 ])
-                ->relationships([
+                ->relationshipData([
                     'role' => [
                         'data' => [
                             'type' => 'roles',
@@ -203,7 +203,7 @@ class DocumentTest extends TestCase
 
         $document = JsonApiDocument::make(
             $users,
-            fn ($item) => $item->attributes()->relationships()
+            fn ($item) => $item->attributes()->relationshipData()
         )->all();
         $expected = [
             'data' => [

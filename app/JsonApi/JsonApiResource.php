@@ -15,8 +15,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 abstract class JsonApiResource extends JsonResource
 {
-    private string $selfLink;
-
     abstract public function allowedAttributes(): array;
 
     /**
@@ -35,6 +33,11 @@ abstract class JsonApiResource extends JsonResource
         return $collection;
     }
 
+    public function getRelationshipKeys(): ?array
+    {
+        return null;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -44,15 +47,17 @@ abstract class JsonApiResource extends JsonResource
     {
         return JsonApiDocument::make($this->resource)
             ->attributes($this->filteredAttributes())
-            ->links([
-                'self' => $this->selfLink(),
-            ])
+            ->links()
+            ->relationshipData($this->getRelationshipKeys())
+            ->relationshipsLinks($this->getRelationshipKeys())
             ->get('data');
     }
 
     public function withResponse(Request $request, JsonResponse $response)
     {
-        $response->withHeaders(['Location' => $this->selfLink()]);
+        $response->withHeaders([
+            'Location' => route('api.v1.'.$this->resource->getResourceType().'.show', $this->resource),
+        ]);
     }
 
     protected function filteredAttributes(): array
@@ -63,10 +68,5 @@ abstract class JsonApiResource extends JsonResource
         return $fields
             ? array_intersect(explode(',', $fields), $this->allowedAttributes())
             : $this->allowedAttributes();
-    }
-
-    protected function selfLink(): string
-    {
-        return $this->selfLink ??= route('api.v1.'.$this->resource->getResourceType().'.show', $this->resource);
     }
 }
