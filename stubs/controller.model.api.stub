@@ -1,0 +1,63 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ namespacedRequests }}
+use {{ rootNamespace }}Http\Resources\{{ model }}Resource;
+use {{ rootNamespace }}JsonApi\JsonApiResource;
+use {{ namespacedModel }};
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+
+class {{ class }} extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): AnonymousResourceCollection
+    {
+        ${{ modelVariable }} = {{ model }}::paginated([]);
+        return {{ model }}Resource::collection(${{ modelVariable }});
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(${{ modelVariable }}): JsonApiResource
+    {
+        // ${{ modelVariable }} = {{ model }}::where('slug', ${{ modelVariable }})->firstOrFail();
+        ${{ modelVariable }} = {{ model }}::findOrFail(${{ modelVariable }});
+
+        return {{ model }}Resource::make(${{ modelVariable }});
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store({{ storeRequest }} $request): JsonApiResource
+    {
+        ${{ modelVariable }} = {{ model }}::create($request->validated('attributes'));
+
+        return {{ model }}Resource::make(${{ modelVariable }});
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update({{ storeRequest }} $request, {{ model }} ${{ modelVariable }}): JsonApiResource
+    {
+        ${{ modelVariable }}->update($request->validated('attributes'));
+
+        return {{ model }}Resource::make(${{ modelVariable }});
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy({{ model }} ${{ modelVariable }}): Response
+    {
+        ${{ modelVariable }}->delete();
+        return response()->noContent();
+    }
+}
