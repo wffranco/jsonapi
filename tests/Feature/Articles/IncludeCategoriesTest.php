@@ -48,4 +48,27 @@ class IncludeCategoriesTest extends TestCase
                 )->all(),
             ]);
     }
+
+    public function test_cannot_include_unknown_relationship()
+    {
+        /** @var Article $article */
+        $article = Article::factory()->createOne();
+
+        $include = 'unknown,unknown2';
+        $error = 'Invalid includes requested: unknown, unknown2';
+        $status = 400;
+
+        $this->getJsonApi(route('api.v1.articles.show', [
+            'article' => $article,
+            'include' => $include,
+        ]))
+            ->assertStatus($status)
+            ->assertSee($error);
+
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'include' => $include,
+        ]))
+            ->assertStatus($status)
+            ->assertSee($error);
+    }
 }

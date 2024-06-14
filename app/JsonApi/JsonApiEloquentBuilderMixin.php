@@ -12,6 +12,19 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class JsonApiEloquentBuilderMixin
 {
+    public function allowedIncludes()
+    {
+        return function (array $allowed = []): Builder {
+            return $this->when(request()->filled('include'), function (Builder $query) use ($allowed) {
+                $includes = explode(',', request('include'));
+                $notAllowed = collect($includes)->diff($allowed);
+                abort_unless($notAllowed->isEmpty(), 400, 'Invalid includes requested: '.$notAllowed->implode(', '));
+
+                return $query->with($includes);
+            });
+        };
+    }
+
     public function filterableBy()
     {
         return function (array $allowed = []): Builder {
