@@ -24,6 +24,16 @@ abstract class JsonApiResource extends JsonResource
     public static function collection($resources)
     {
         $collection = parent::collection($resources);
+
+        if (request()->filled('include')) {
+            $collection->with['included'] = [];
+            foreach ($resources as $resource) {
+                foreach ($resource->getIncludes() as $include) {
+                    $collection->with['included'][] = $include;
+                }
+            }
+        }
+
         $collection->with['links'] = [
             'self' => method_exists($resources, 'path')
                 ? $resources->path()

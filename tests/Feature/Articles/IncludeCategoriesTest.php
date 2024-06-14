@@ -31,4 +31,21 @@ class IncludeCategoriesTest extends TestCase
                 ],
             ]);
     }
+
+    public function test_can_include_related_categories_of_multiple_articles()
+    {
+        /** @var Article $article */
+        $articles = Article::factory()->count(3)->create();
+
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'include' => 'category',
+        ]))
+            ->assertOk()
+            ->assertJson([
+                'data' => [],
+                'included' => $articles->map(
+                    fn (Article $article) => JsonApiDocument::make($article->category)->attributes()->get('data')
+                )->all(),
+            ]);
+    }
 }
