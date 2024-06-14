@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -71,6 +72,35 @@ class FilterArticlesTest extends TestCase
         ]))
             ->assertJsonCount(1, 'data')
             ->assertSee($article->title);
+    }
+
+    public function test_can_filter_articles_by_categories()
+    {
+        $articles = Article::factory()->count(2)->create();
+        $category1 = Category::factory()->hasArticles(2)->create(['slug' => 'cat-1']);
+        $category2 = Category::factory()->hasArticles(1)->create(['slug' => 'cat-2']);
+
+        // Filter by one category.
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'filter' => ['category' => 'cat-1'],
+        ]))
+            ->assertJsonCount(2, 'data')
+            ->assertSee($category1->articles[0]->title)
+            ->assertSee($category1->articles[1]->title)
+            ->assertDontSee($category2->articles[0]->title)
+            ->assertDontSee($articles[0]->title)
+            ->assertDontSee($articles[1]->title);
+
+        // Filter by multiple categories.
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'filter' => ['category' => 'cat-1,cat-2'],
+        ]))
+            ->assertJsonCount(3, 'data')
+            ->assertSee($category1->articles[0]->title)
+            ->assertSee($category1->articles[1]->title)
+            ->assertSee($category2->articles[0]->title)
+            ->assertDontSee($articles[0]->title)
+            ->assertDontSee($articles[1]->title);
     }
 
     public function test_cannot_filter_articles_by_unknown_field()

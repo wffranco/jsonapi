@@ -6,6 +6,9 @@ use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @method static hasArticles($num)
+ */
 class CategoryFactory extends Factory
 {
     /**

@@ -18,7 +18,7 @@ class ArticleController extends Controller
         $articles = Article::query()
             ->allowedIncludes(['category'])
             ->sparseFields(['title', 'content', 'slug'])
-            ->filterableBy(['title', 'content', 'year', 'month', 'day'])
+            ->filterableBy(['title', 'content', 'year', 'month', 'day', 'category'])
             ->sortableBy(['title', 'content'])
             ->paginated(['sort', 'filter']);
 

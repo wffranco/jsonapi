@@ -32,9 +32,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static static whereUserId($value)
  *
  * Scopes:
- * @method static Builder|static day($day)
- * @method static Builder|static month($month)
- * @method static Builder|static year($year)
+ * @method static Builder|self category(string $categories) Category filter
+ * @method static Builder|self day($day)
+ * @method static Builder|self month($month)
+ * @method static Builder|self year($year)
  *
  * @mixin \Eloquent
  */
@@ -69,25 +70,30 @@ class Article extends Model
         return 'slug';
     }
 
+    /** Category relationship */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    /** @param static $query */
-    public function scopeDay(Builder $query, $day)
+    public function scopeCategory(Builder|self $query, string $categories)
+    {
+        return $query->whereHas('category',
+            fn (Builder|Category $query) => $query->whereIn('slug', explode(',', $categories)),
+        );
+    }
+
+    public function scopeDay(Builder|self $query, $day)
     {
         return $query->whereDay('created_at', $day);
     }
 
-    /** @param static $query */
-    public function scopeMonth(Builder $query, $month)
+    public function scopeMonth(Builder|self $query, $month)
     {
         return $query->whereMonth('created_at', $month);
     }
 
-    /** @param static $query */
-    public function scopeYear(Builder $query, $year)
+    public function scopeYear(Builder|self $query, $year)
     {
         return $query->whereYear('created_at', $year);
     }
