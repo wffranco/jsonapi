@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -29,6 +30,9 @@ abstract class JsonApiResource extends JsonResource
             $collection->with['included'] = [];
             foreach ($resources as $resource) {
                 foreach ($resource->getIncludes() as $include) {
+                    if ($include->resource instanceof MissingValue) {
+                        continue;
+                    }
                     $collection->with['included'][] = $include;
                 }
             }
@@ -61,7 +65,13 @@ abstract class JsonApiResource extends JsonResource
     public function toArray(Request $request): array
     {
         if (request()->filled('include')) {
-            $this->with['included'] = $this->getIncludes();
+            $this->with['included'] = [];
+            foreach ($this->getIncludes() as $include) {
+                if ($include->resource instanceof MissingValue) {
+                    continue;
+                }
+                $this->with['included'][] = $include;
+            }
         }
 
         return JsonApiDocument::make($this->resource)
