@@ -33,6 +33,11 @@ abstract class JsonApiResource extends JsonResource
         return $collection;
     }
 
+    public function getIncludes(): array
+    {
+        return [];
+    }
+
     public function getRelationshipKeys(): ?array
     {
         return null;
@@ -45,6 +50,10 @@ abstract class JsonApiResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if (request()->filled('include')) {
+            $this->with['included'] = $this->getIncludes();
+        }
+
         return JsonApiDocument::make($this->resource)
             ->attributes($this->filteredAttributes())
             ->links()

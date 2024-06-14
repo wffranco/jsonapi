@@ -15,6 +15,13 @@ class ArticleResource extends JsonApiResource
         return ['title', 'content', 'slug'];
     }
 
+    public function getIncludes(): array
+    {
+        return [
+            CategoryResource::make($this->resource->category),
+        ];
+    }
+
     public function getRelationshipKeys(): array
     {
         return ['category'];
