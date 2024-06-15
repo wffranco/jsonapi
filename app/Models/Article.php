@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $category_id
+ * @property string $user_id
  * @property string $title
  * @property string $content
  * @property string $slug
@@ -50,6 +51,7 @@ class Article extends Model
      */
     protected $fillable = [
         'category_id',
+        'user_id',
         'title',
         'content',
         'slug',

@@ -33,6 +33,10 @@ class StoreArticleRequest extends FormRequest
                 new Slug,
                 Rule::unique('articles', 'slug')->ignore($this->route('article')),
             ],
+            'data.relationships.author.data.id' => [
+                Rule::requiredIf(! $this->route('article')),
+                Rule::exists('users', 'id'),
+            ],
             'data.relationships.category.data.id' => [
                 Rule::requiredIf(! $this->route('article')),
                 Rule::exists('categories', 'slug'),
@@ -47,6 +51,10 @@ class StoreArticleRequest extends FormRequest
         $slug = Arr::get($validated, 'relationships.category.data.id');
         if ($category = Category::where('slug', $slug)->first()) {
             Arr::set($validated, 'attributes.category_id', $category->id);
+        }
+
+        if ($author_id = Arr::get($validated, 'relationships.author.data.id')) {
+            Arr::set($validated, 'attributes.user_id', $author_id);
         }
 
         return Arr::get($validated, $key, $default);
