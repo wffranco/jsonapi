@@ -18,12 +18,13 @@ class ArticleResource extends JsonApiResource
     public function getIncludes(): array
     {
         return [
+            AuthorResource::make($this->whenLoaded('author')),
             CategoryResource::make($this->whenLoaded('category')),
         ];
     }
 
     public function getRelationshipKeys(): array
     {
-        return ['category'];
+        return ['author', 'category'];
     }
 }

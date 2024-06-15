@@ -20,7 +20,7 @@ class ListArticlesTest extends TestCase
         $this->getJsonApi(route('api.v1.articles.show', $article))
             ->assertOk()
             ->assertJsonApiResource($article, ['title', 'content', 'slug'])
-            ->assertJsonApiRelationshipLinks($article, ['category']);
+            ->assertJsonApiRelationshipLinks($article, ['author', 'category']);
     }
 
     public function test_can_fetch_all_articles(): void

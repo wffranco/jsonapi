@@ -16,7 +16,10 @@ Route::apiResource('categories', CategoryController::class)
     ->except('store', 'update', 'destroy');
 
 Route::apiResource('articles', ArticleController::class);
-Route::get('articles/{article}/relationships/category', fn () => 'TODO')
-    ->name('articles.relationships.category');
-Route::get('articles/{article}/category', fn () => 'TODO')
-    ->name('articles.category');
+Route::prefix('articles')->name('articles.')->group(function () {
+    Route::get('{article}/relationships/author', fn () => 'TODO')->name('relationships.author');
+    Route::get('{article}/author', fn () => 'TODO')->name('author');
+
+    Route::get('{article}/relationships/category', fn () => 'TODO')->name('relationships.category');
+    Route::get('{article}/category', fn () => 'TODO')->name('category');
+});
