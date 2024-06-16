@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ArticleAuthorController;
+use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
@@ -17,9 +19,9 @@ Route::apiResource('categories', CategoryController::class)
 
 Route::apiResource('articles', ArticleController::class);
 Route::prefix('articles')->name('articles.')->group(function () {
-    Route::get('{article}/relationships/author', fn () => 'TODO')->name('relationships.author');
-    Route::get('{article}/author', fn () => 'TODO')->name('author');
+    Route::get('{article}/relationships/author', [ArticleAuthorController::class, 'index'])->name('relationships.author');
+    Route::get('{article}/author', [ArticleAuthorController::class, 'show'])->name('author');
 
-    Route::get('{article}/relationships/category', fn () => 'TODO')->name('relationships.category');
-    Route::get('{article}/category', fn () => 'TODO')->name('category');
+    Route::get('{article}/relationships/category', [ArticleCategoryController::class, 'index'])->name('relationships.category');
+    Route::get('{article}/category', [ArticleCategoryController::class, 'show'])->name('category');
 });

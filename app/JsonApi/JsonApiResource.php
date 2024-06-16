@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
+use Illuminate\Support\Arr;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -16,6 +17,8 @@ use Illuminate\Http\Resources\MissingValue;
  */
 abstract class JsonApiResource extends JsonResource
 {
+    protected bool $identifier = false;
+
     abstract public function allowedAttributes(): array;
 
     /**
@@ -47,6 +50,23 @@ abstract class JsonApiResource extends JsonResource
         return $collection;
     }
 
+    public function get(?string $key = null, $default = null): array
+    {
+        $data = static::$wrap
+            ? [static::$wrap => $this->toArray(request())]
+            : $this->toArray(request());
+
+        return Arr::get($data, $key, $default);
+    }
+
+    /**
+     * @param  TModel|LengthAwarePaginator  $resource
+     */
+    public static function getIdentifier($resource): array
+    {
+        return static::make($resource)->identifier()->get();
+    }
+
     public function getIncludes(): array
     {
         return [];
@@ -58,12 +78,30 @@ abstract class JsonApiResource extends JsonResource
     }
 
     /**
+     * @param  TModel|LengthAwarePaginator  $resource
+     */
+    public static function getResource($resource): array
+    {
+        return static::make($resource)->get();
+    }
+
+    public function identifier(bool $identifier = true): static
+    {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
+        if ($this->identifier) {
+            return JsonApiDocument::make($this->resource)->get('data');
+        }
         if (request()->filled('include')) {
             $this->with['included'] = [];
             foreach ($this->getIncludes() as $include) {
