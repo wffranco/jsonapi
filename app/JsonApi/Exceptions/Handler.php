@@ -29,23 +29,14 @@ class Handler
 
     public function renderExceptions()
     {
-        $this->exceptions->render(function (NotFoundHttpException $e) {
-            throw new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e);
-        });
         $this->exceptions->render(function (BadRequestHttpException $e, Request $request) {
             return (new JsonApi\BadRequestHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
         });
-        $this->exceptions->render(function (ValidationException $e) {
-            return response()->json([
-                'errors' => collect($e->errors())
-                    ->map(fn ($message, $field) => [
-                        'title' => $e->getMessage(),
-                        'detail' => $message[0],
-                        'source' => ['pointer' => '/'.str_replace('.', '/', $field)],
-                    ])->values(),
-            ], 422, [
-                'Content-Type' => 'application/vnd.api+json',
-            ]);
+        $this->exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+        });
+        $this->exceptions->render(function (ValidationException $e, Request $request) {
+            return (new JsonApi\ValidationException($e->validator))->render($request);
         });
 
         return $this;

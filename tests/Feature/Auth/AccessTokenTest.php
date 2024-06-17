@@ -15,18 +15,70 @@ class AccessTokenTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->postJson(route('api.v1.login'), [
-            'email' => $user->email,
-            'password' => 'password',
-            'device_name' => 'test',
-        ], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ]);
+        $response = $this->login(user: $user);
 
-        $token = $response->json('plain-text-token');
+        $token = $response->json('token');
         $dbToken = PersonalAccessToken::findToken($token);
 
         $this->assertTrue($dbToken->tokenable->is($user));
+    }
+
+    public function test_password_is_required()
+    {
+        $this->login(['password' => null])
+            ->assertJsonValidationErrors(['password' => 'required']);
+    }
+
+    public function test_password_must_be_valid()
+    {
+        $this->login(['password' => 'wrong-password'])
+            ->assertJsonValidationErrors('email');
+    }
+
+    public function test_user_must_be_registered()
+    {
+        $this->login()
+            ->assertJsonValidationErrors('email');
+    }
+
+    public function test_email_is_required()
+    {
+        $this->login(['email' => null])
+            ->assertJsonValidationErrors(['email' => 'required']);
+    }
+
+    public function test_email_must_be_valid()
+    {
+        $this->login(['email' => 'invalid-email'])
+            ->assertJsonValidationErrors(['email' => 'valid email']);
+    }
+
+    public function test_device_name_is_required()
+    {
+        $this->login(['device_name' => null])
+            ->assertJsonValidationErrors(['device_name' => 'required']);
+    }
+
+    public function test_device_name_must_be_string()
+    {
+        $this->login(['device_name' => 123])
+            ->assertJsonValidationErrors(['device_name' => 'string']);
+    }
+
+    // Helper methods
+
+    protected function login(array $data = [], ?User $user = null)
+    {
+        $user ??= User::factory()->make(); // Unregistered user
+
+        // Add credentials and headers to the request
+        return $this->postJson(route('api.v1.login'), array_merge([
+            'email' => $user->email,
+            'password' => 'password',
+            'device_name' => 'test',
+        ], $data), [
+            'Accept' => 'application/vnd.api+json',
+            'Content-Type' => 'application/vnd.api+json',
+        ]);
     }
 }
