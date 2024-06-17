@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +21,10 @@ class ValidateJsonApiDocument
             $request->validate([
                 'data' => ['required', 'array'],
                 'data.type' => ['required', 'string'],
-                'data.attributes' => ['required', 'array'],
+                'data.attributes' => [
+                    Rule::requiredIf(! Str::contains($request->url(), 'relationships')),
+                    'array',
+                ],
                 'data.id' => [
                     Rule::requiredIf($request->isMethod('PATCH')),
                     'string',

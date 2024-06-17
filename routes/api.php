@@ -20,8 +20,10 @@ Route::apiResource('categories', CategoryController::class)
 Route::apiResource('articles', ArticleController::class);
 Route::prefix('articles')->name('articles.')->group(function () {
     Route::get('{article}/relationships/author', [ArticleAuthorController::class, 'index'])->name('relationships.author');
+    Route::patch('{article}/relationships/author', [ArticleAuthorController::class, 'update'])->name('relationships.author');
     Route::get('{article}/author', [ArticleAuthorController::class, 'show'])->name('author');
 
     Route::get('{article}/relationships/category', [ArticleCategoryController::class, 'index'])->name('relationships.category');
+    Route::patch('{article}/relationships/category', [ArticleCategoryController::class, 'update'])->name('relationships.category');
     Route::get('{article}/category', [ArticleCategoryController::class, 'show'])->name('category');
 });
