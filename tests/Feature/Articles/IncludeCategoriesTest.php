@@ -55,20 +55,19 @@ class IncludeCategoriesTest extends TestCase
         $article = Article::factory()->createOne();
 
         $include = 'unknown,unknown2';
-        $error = 'Invalid includes requested: unknown, unknown2';
+        $title = 'Bad Request';
+        $detail = "Includes not allowed in 'articles' resource: unknown, unknown2.";
         $status = 400;
 
         $this->getJsonApi(route('api.v1.articles.show', [
             'article' => $article,
             'include' => $include,
         ]))
-            ->assertStatus($status)
-            ->assertSee($error);
+            ->assertJsonApiError($title, $detail, $status);
 
         $this->getJsonApi(route('api.v1.articles.index', [
             'include' => $include,
         ]))
-            ->assertStatus($status)
-            ->assertSee($error);
+            ->assertJsonApiError($title, $detail, $status);
     }
 }

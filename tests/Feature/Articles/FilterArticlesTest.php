@@ -109,6 +109,10 @@ class FilterArticlesTest extends TestCase
             'filter' => ['unknown' => 'value'],
         ]))
             ->assertStatus(400)
-            ->assertSee('filter.unknown');
+            ->assertJsonApiError(
+                title: 'Bad Request',
+                detail: "Filter not allowed in 'articles' resource: unknown.",
+                status: 400,
+            );
     }
 }
