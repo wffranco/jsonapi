@@ -5,6 +5,7 @@ namespace App\JsonApi\Exceptions;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler
 {
@@ -26,6 +27,22 @@ class Handler
 
     public function renderExceptions()
     {
+        $this->exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            $id = $request->input('data.id');
+            $type = $request->input('data.type');
+
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => 'Not Found',
+                        'status' => '404',
+                        'detail' => "Not found the id '{$id}' in the '{$type}' resource.",
+                    ],
+                ],
+            ], 404, [
+                'Content-Type' => 'application/vnd.api+json',
+            ]);
+        });
         $this->exceptions->render(function (ValidationException $e) {
             return response()->json([
                 'errors' => collect($e->errors())

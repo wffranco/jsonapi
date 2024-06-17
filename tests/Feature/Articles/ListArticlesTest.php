@@ -32,4 +32,17 @@ class ListArticlesTest extends TestCase
             ->assertJsonCount(3, 'data')
             ->assertJsonApiCollection($articles, ['title', 'content', 'slug']);
     }
+
+    public function test_returns_a_json_api_error_when_article_not_found(): void
+    {
+        $this->getJsonApi(route('api.v1.articles.show', ['article' => 999]))
+            ->assertNotFound()
+            ->assertJsonStructure([
+                'errors' => [
+                    '*' => [],
+                ],
+            ])
+            ->assertJsonPath('errors.0.title', 'Not Found')
+            ->assertJsonPath('errors.0.detail', "Not found the id '999' in the 'articles' resource.");
+    }
 }
