@@ -15,21 +15,30 @@ class CreateArticlesTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_guests_cannot_create_articles(): void
+    {
+        $this->postJsonApi(route('api.v1.articles.store'))
+            ->assertUnauthorized();
+        // ->assertJsonApiError('Unauthenticated.', 401);
+        $this->assertDatabaseCount('articles', 0);
+    }
+
     public function test_can_create_articles(): void
     {
         $user = User::factory()->create();
         $category = Category::factory()->create();
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'attributes' => [
-                'title' => 'Title',
-                'content' => 'Content',
-                'slug' => 'slug',
-            ],
-            'relationships' => [
-                'author' => $user,
-                'category' => $category,
-            ],
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'attributes' => [
+                    'title' => 'Title',
+                    'content' => 'Content',
+                    'slug' => 'slug',
+                ],
+                'relationships' => [
+                    'author' => $user,
+                    'category' => $category,
+                ],
+            ])
             ->assertCreated()
             ->assertJsonApiHeaderLocation($article = Article::first())
             ->assertJsonApiResource($article, ['title', 'content', 'slug']);
@@ -43,115 +52,130 @@ class CreateArticlesTest extends TestCase
 
     public function test_title_is_required(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'content' => 'Content',
-            'slug' => 'slug',
-        ])
+
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'content' => 'Content',
+                'slug' => 'slug',
+            ])
             ->assertJsonApiValidationErrors('title');
     }
 
     public function test_content_is_required(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'slug' => 'slug',
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'slug' => 'slug',
+            ])
             ->assertJsonApiValidationErrors('content');
     }
 
     public function test_article_category_relationship_is_required(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'slug',
-        ])->assertJsonApiValidationErrors('relationships.category');
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug',
+            ])
+            ->assertJsonApiValidationErrors('relationships.category');
     }
 
     public function test_article_category_must_exist(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'attributes' => [
-                'title' => 'Title',
-                'content' => 'Content',
-                'slug' => 'slug',
-            ],
-            'relationships' => [
-                'category' => [
-                    'data' => [
-                        'type' => 'categories',
-                        'id' => 'any-id',
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'attributes' => [
+                    'title' => 'Title',
+                    'content' => 'Content',
+                    'slug' => 'slug',
+                ],
+                'relationships' => [
+                    'category' => [
+                        'data' => [
+                            'type' => 'categories',
+                            'id' => 'any-id',
+                        ],
                     ],
                 ],
-            ],
-        ])->assertJsonApiValidationErrors('relationships.category');
+            ])
+            ->assertJsonApiValidationErrors('relationships.category');
     }
 
     public function test_slug_is_unique_on_create(): void
     {
         $article = Article::factory()->create();
 
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => $article->slug,
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => $article->slug,
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_be_a_string(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 1,
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 1,
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_not_start_with_a_hyphen(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => '-slug',
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => '-slug',
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_not_end_with_a_hyphen(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'slug-',
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug-',
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_not_contain_consecutive_hyphens(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'slug--slug',
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug--slug',
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_not_contain_invalid_characters(): void
     {
-        $this->postJsonApi(route('api.v1.articles.store'), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'Invalid Slug',
-        ])
+        $this->actingAs()
+            ->postJsonApi(route('api.v1.articles.store'), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'Invalid Slug',
+            ])
             ->assertJsonApiValidationErrors('slug');
     }
 
     public function test_slug_must_match_a_valid_slug_pattern(): void
     {
         $user = User::factory()->create();
+        $this->actingAs($user);
+
         $category = Category::factory()->create();
 
         $this->postJsonApi(route('api.v1.articles.store'), [
@@ -164,7 +188,9 @@ class CreateArticlesTest extends TestCase
                 'author' => $user,
                 'category' => $category,
             ],
-        ])->assertCreated();
+        ])
+            ->assertCreated();
+
         $this->postJsonApi(route('api.v1.articles.store'), [
             'attributes' => [
                 'title' => 'Title',
@@ -175,6 +201,7 @@ class CreateArticlesTest extends TestCase
                 'author' => $user,
                 'category' => $category,
             ],
-        ])->assertCreated();
+        ])
+            ->assertCreated();
     }
 }

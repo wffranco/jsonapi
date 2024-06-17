@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,15 +14,25 @@ class UpdateArticlesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_update_articles(): void
+    public function test_guests_cannot_update_articles(): void
     {
         $article = Article::factory()->create();
 
-        $this->patchJsonApi(route('api.v1.articles.update', $article), [
-            'title' => 'Title',
-            'content' => 'Content',
-            'slug' => 'slug',
-        ])
+        $this->patchJsonApi(route('api.v1.articles.update', $article))
+            ->assertUnauthorized();
+        // ->assertJsonApiError('Unauthenticated.', 401);
+    }
+
+    public function test_can_update_owned_post(): void
+    {
+        $article = Article::factory()->create();
+
+        $this->actingAs($article->author)
+            ->patchJsonApi(route('api.v1.articles.update', $article), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug',
+            ])
             ->assertOk()
             ->assertJsonApiHeaderLocation($article->refresh())
             ->assertJsonApiResource($article, ['title', 'content', 'slug']);
@@ -30,26 +41,30 @@ class UpdateArticlesTest extends TestCase
     public function test_title_is_required(): void
     {
         $article = Article::factory()->create();
-        $this->patchJsonApi(route('api.v1.articles.update', $article), [
-            'content' => 'Content',
-            'slug' => 'slug',
-        ])
+        $this->actingAs($article->author)
+            ->patchJsonApi(route('api.v1.articles.update', $article), [
+                'content' => 'Content',
+                'slug' => 'slug',
+            ])
             ->assertJsonApiValidationErrors('title');
     }
 
     public function test_content_is_required(): void
     {
         $article = Article::factory()->create();
-        $this->patchJsonApi(route('api.v1.articles.update', $article), [
-            'title' => 'Title',
-            'slug' => 'slug',
-        ])
+        $this->actingAs($article->author)
+            ->patchJsonApi(route('api.v1.articles.update', $article), [
+                'title' => 'Title',
+                'slug' => 'slug',
+            ])
             ->assertJsonApiValidationErrors('content');
     }
 
     public function test_slug_is_unique_on_update(): void
     {
-        $articles = Article::factory()->count(2)->create();
+        $user = User::factory()->create();
+        $articles = Article::factory()->count(2)->create(['user_id' => $user->id]);
+        $this->actingAs($user);
 
         // Slug can't be stored in another article
         $this->patchJsonApi(route('api.v1.articles.update', $articles[0]), [
