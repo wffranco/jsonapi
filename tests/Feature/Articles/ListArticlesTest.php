@@ -37,12 +37,10 @@ class ListArticlesTest extends TestCase
     {
         $this->getJsonApi(route('api.v1.articles.show', ['article' => 999]))
             ->assertNotFound()
-            ->assertJsonStructure([
-                'errors' => [
-                    '*' => [],
-                ],
-            ])
-            ->assertJsonPath('errors.0.title', 'Not Found')
-            ->assertJsonPath('errors.0.detail', "Not found the id '999' in the 'articles' resource.");
+            ->assertJsonApiError(
+                title: 'Not Found',
+                detail: "Not found the id '999' in the 'articles' resource.",
+                status: 404,
+            );
     }
 }

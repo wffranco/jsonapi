@@ -51,6 +51,20 @@ class JsonApiTestResponseMixin
         };
     }
 
+    public function assertJsonApiError()
+    {
+        return function (?string $title = null, ?string $detail = null, ?int $status = null): TestResponse {
+            /** @var TestResponse $this */
+            $status && $this->assertStatus($status);
+            $this->assertJsonStructure(['errors' => ['*' => []]]);
+            $title && $this->assertJsonFragment(['title' => $title]);
+            $detail && $this->assertJsonFragment(['detail' => $detail]);
+            $status && $this->assertJsonFragment(['status' => (string) $status]);
+
+            return $this;
+        };
+    }
+
     public function assertJsonApiHeaderContentType()
     {
         return function (): TestResponse {

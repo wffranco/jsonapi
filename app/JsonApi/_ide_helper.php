@@ -41,6 +41,9 @@ namespace Illuminate\Testing {
         public function assertJsonApiCollectionStructure(array $attributeKeys = [])
         { return static::$mixin->assertJsonApiCollectionStructure()($attributeKeys); }
         /** @return static */
+        public function assertJsonApiError(?string $title = null, ?string $detail = null, ?int $status = null)
+        { return static::$mixin->assertJsonApiError()($title, $detail, $status); }
+        /** @return static */
         public function assertJsonApiHeaderContentType()
         { return static::$mixin->assertJsonApiHeaderContentType()(); }
         /** @return static */
