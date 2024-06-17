@@ -2,6 +2,7 @@
 
 namespace App\JsonApi\Exceptions;
 
+use App\JsonApi\Exceptions as JsonApi;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -27,21 +28,8 @@ class Handler
 
     public function renderExceptions()
     {
-        $this->exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            $id = $request->input('data.id');
-            $type = $request->input('data.type');
-
-            return response()->json([
-                'errors' => [
-                    [
-                        'title' => 'Not Found',
-                        'status' => '404',
-                        'detail' => "Not found the id '{$id}' in the '{$type}' resource.",
-                    ],
-                ],
-            ], 404, [
-                'Content-Type' => 'application/vnd.api+json',
-            ]);
+        $this->exceptions->render(function (NotFoundHttpException $e) {
+            throw new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e);
         });
         $this->exceptions->render(function (ValidationException $e) {
             return response()->json([

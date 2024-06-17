@@ -56,6 +56,11 @@ class JsonApiTestResponseMixin
         return function (?string $title = null, ?string $detail = null, ?int $status = null): TestResponse {
             /** @var TestResponse $this */
             $status && $this->assertStatus($status);
+            try {
+                $this->assertJsonStructure(['errors' => ['*' => ['title', 'detail']]]);
+            } catch (\Throwable $e) {
+                PHPUnit::fail("Error object MUST be returned as an array keyed by 'errors' in the top level of a JSON:API document.".PHP_EOL.PHP_EOL.$e->getMessage());
+            }
             $this->assertJsonStructure(['errors' => ['*' => []]]);
             $title && $this->assertJsonFragment(['title' => $title]);
             $detail && $this->assertJsonFragment(['detail' => $detail]);
