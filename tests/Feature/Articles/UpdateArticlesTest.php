@@ -30,7 +30,7 @@ class UpdateArticlesTest extends TestCase
     {
         $article = Article::factory()->create();
 
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:update'])
             ->patchJsonApi(route('api.v1.articles.update', $article), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -45,7 +45,7 @@ class UpdateArticlesTest extends TestCase
     {
         $article = Article::factory()->create();
 
-        $this->actingAs()
+        $this->actingAs(null, ['article:update'])
             ->patchJsonApi(route('api.v1.articles.update', $article), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -57,7 +57,7 @@ class UpdateArticlesTest extends TestCase
     public function test_title_is_required(): void
     {
         $article = Article::factory()->create();
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:update'])
             ->patchJsonApi(route('api.v1.articles.update', $article), [
                 'content' => 'Content',
                 'slug' => 'slug',
@@ -68,7 +68,7 @@ class UpdateArticlesTest extends TestCase
     public function test_content_is_required(): void
     {
         $article = Article::factory()->create();
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:update'])
             ->patchJsonApi(route('api.v1.articles.update', $article), [
                 'title' => 'Title',
                 'slug' => 'slug',
@@ -80,7 +80,7 @@ class UpdateArticlesTest extends TestCase
     {
         $user = User::factory()->create();
         $articles = Article::factory()->count(2)->create(['user_id' => $user->id]);
-        $this->actingAs($user);
+        $this->actingAs($user, ['article:update']);
 
         // Slug can't be stored in another article
         $this->patchJsonApi(route('api.v1.articles.update', $articles[0]), [

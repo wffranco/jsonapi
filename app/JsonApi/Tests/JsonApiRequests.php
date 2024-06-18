@@ -35,10 +35,11 @@ trait JsonApiRequests
         return $this;
     }
 
-    public function actingAs(?UserContract $user = null, $guard = null): static
+    public function actingAs(?UserContract $user = null, $abilities = null): static
     {
         Sanctum::actingAs(
             $user ?? User::factory()->createOne(),
+            $abilities ?? [],
         );
 
         return $this;

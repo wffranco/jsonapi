@@ -35,7 +35,7 @@ class DeleteArticlesTest extends TestCase
 
         $this->assertDatabaseCount('articles', 1);
 
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:delete'])
             ->deleteJsonApi(route('api.v1.articles.destroy', $article))
             ->assertNoContent();
 
@@ -48,7 +48,7 @@ class DeleteArticlesTest extends TestCase
 
         $this->assertDatabaseCount('articles', 1);
 
-        $this->actingAs()
+        $this->actingAs(null, ['article:delete'])
             ->deleteJsonApi(route('api.v1.articles.destroy', $article))
             ->assertForbidden();
 

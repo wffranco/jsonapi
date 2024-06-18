@@ -49,6 +49,7 @@ class ArticleController extends Controller implements HasMiddleware
 
     public function store(StoreArticleRequest $request): JsonApiResource
     {
+        $this->authorize('create', Article::class);
         $article = Article::create($request->validated('attributes'));
 
         return ArticleResource::make($article);

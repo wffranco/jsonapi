@@ -33,7 +33,7 @@ class AuthorRelationshipTest extends TestCase
         $article = Article::factory()->createOne();
         $author = User::factory()->createOne();
 
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:update'])
             ->patchJsonApi(
                 route('api.v1.articles.relationships.author', $article),
                 AuthorResource::getIdentifier($author),
@@ -51,7 +51,7 @@ class AuthorRelationshipTest extends TestCase
     {
         $article = Article::factory()->createOne();
 
-        $this->actingAs($article->author)
+        $this->actingAs($article->author, ['article:update'])
             ->patchJsonApi(
                 route('api.v1.articles.relationships.author', $article),
                 ['data' => ['type' => 'users', 'id' => 999]],

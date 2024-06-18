@@ -30,7 +30,7 @@ class CreateArticlesTest extends TestCase
     {
         $user = User::factory()->create();
         $category = Category::factory()->create();
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'attributes' => [
                     'title' => 'Title',
@@ -56,7 +56,7 @@ class CreateArticlesTest extends TestCase
     public function test_title_is_required(): void
     {
 
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'content' => 'Content',
                 'slug' => 'slug',
@@ -66,7 +66,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_content_is_required(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'slug' => 'slug',
@@ -76,7 +76,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_article_category_relationship_is_required(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -87,7 +87,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_article_category_must_exist(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'attributes' => [
                     'title' => 'Title',
@@ -110,7 +110,7 @@ class CreateArticlesTest extends TestCase
     {
         $article = Article::factory()->create();
 
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -121,7 +121,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_be_a_string(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -132,7 +132,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_not_start_with_a_hyphen(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -143,7 +143,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_not_end_with_a_hyphen(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -154,7 +154,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_not_contain_consecutive_hyphens(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -165,7 +165,7 @@ class CreateArticlesTest extends TestCase
 
     public function test_slug_must_not_contain_invalid_characters(): void
     {
-        $this->actingAs()
+        $this->actingAs(null, ['article:create'])
             ->postJsonApi(route('api.v1.articles.store'), [
                 'title' => 'Title',
                 'content' => 'Content',
@@ -177,7 +177,7 @@ class CreateArticlesTest extends TestCase
     public function test_slug_must_match_a_valid_slug_pattern(): void
     {
         $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user, ['article:create']);
 
         $category = Category::factory()->create();
 
