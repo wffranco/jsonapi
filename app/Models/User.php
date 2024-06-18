@@ -28,6 +28,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read int|null $notifications_count
  * @property-read Collection<PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ * @property-read Collection<Permission> $permissions
+ * @property-read int|null $permissions_count
  *
  * @method static UserFactory<static> factory($count = null, $state = [])
  * @method static static newModelQuery()
@@ -84,5 +86,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    public function givePermissionTo(string|Permission $permission)
+    {
+        if (is_string($permission)) {
+            $permission = Permission::where('name', $permission)->firstOrFail();
+        }
+        $this->permissions()->syncWithoutDetaching($permission);
+
+        return $this;
     }
 }

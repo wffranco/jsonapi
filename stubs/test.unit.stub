@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+// use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\TestCase;
+// use Tests\TestCase;
+
+class {{ class }} extends TestCase
+{
+    // use LazilyRefreshDatabase;
+
+    public function test_example(): void
+    {
+        $this->assertTrue(true);
+    }
+}
