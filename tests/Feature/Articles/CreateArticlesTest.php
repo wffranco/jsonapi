@@ -18,8 +18,11 @@ class CreateArticlesTest extends TestCase
     public function test_guests_cannot_create_articles(): void
     {
         $this->postJsonApi(route('api.v1.articles.store'))
-            ->assertUnauthorized();
-        // ->assertJsonApiError('Unauthenticated.', 401);
+            ->assertJsonApiError(
+                title: 'Unauthenticated',
+                detail: 'This action requires authentication.',
+                status: 401,
+            );
         $this->assertDatabaseCount('articles', 0);
     }
 

@@ -58,7 +58,7 @@ class JsonApiTestResponseMixin
             $status && $this->assertStatus($status);
             try {
                 $this->assertJsonStructure(['errors' => ['*' => ['title', 'detail']]]);
-            } catch (\Throwable $e) {
+            } catch (ExpectationFailedException $e) {
                 PHPUnit::fail("Error object MUST be returned as an array keyed by 'errors' in the top level of a JSON:API document.".PHP_EOL.PHP_EOL.$e->getMessage());
             }
             $this->assertJsonStructure(['errors' => ['*' => []]]);
@@ -91,7 +91,7 @@ class JsonApiTestResponseMixin
             try {
                 $this->assertHeader('Location', route('api.v1.'.$model->getResourceType().'.show', $model));
             } catch (ExpectationFailedException $e) {
-                PHPUnit::fail("Failed to find a valid JSON:API header 'Location'".PHP_EOL.PHP_EOL.$e->getMessage());
+                PHPUnit::fail('Failed to find a valid JSON:API header "Location"'.PHP_EOL.PHP_EOL.$e->getMessage());
             }
 
             return $this;
