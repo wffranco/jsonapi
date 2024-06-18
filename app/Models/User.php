@@ -93,12 +93,18 @@ class User extends Authenticatable
         return $this->belongsToMany(Permission::class);
     }
 
-    public function givePermissionTo(string|Permission $permission)
+    public function givePermissionsTo(array|string|Permission|Collection $permissions)
     {
-        if (is_string($permission)) {
-            $permission = Permission::where('name', $permission)->firstOrFail();
+        if (is_string($permissions)) {
+            $permissions = Permission::where('name', $permissions)->first();
         }
-        $this->permissions()->syncWithoutDetaching($permission);
+        if (is_array($permissions)) {
+            // Separate the permissions that are instances of Permission from the rest
+            [$instances, $names] = collect($permissions)->partition(fn ($permission) => $permission instanceof Permission);
+            // Search other permissions by name, and merge them with the instances
+            $permissions = Permission::whereIn('name', $names)->get()->merge($instances);
+        }
+        $this->permissions()->syncWithoutDetaching($permissions);
 
         return $this;
     }

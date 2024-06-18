@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TokenResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -25,10 +26,6 @@ class LoginController extends Controller
             ]);
         }
 
-        $plainTextToken = $user->createToken($request->device_name)->plainTextToken;
-
-        return response()->json([
-            'plain-text-token' => $plainTextToken,
-        ]);
+        return TokenResource::make($user);
     }
 }

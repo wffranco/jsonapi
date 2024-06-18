@@ -16,7 +16,7 @@ class UserPermissionsTest extends TestCase
     {
         $user = User::factory()->create();
         $permission = Permission::factory()->create();
-        $user->givePermissionTo($permission);
+        $user->givePermissionsTo($permission);
 
         $this->assertCount(1, $user->fresh()->permissions);
     }
@@ -25,8 +25,8 @@ class UserPermissionsTest extends TestCase
     {
         $user = User::factory()->create();
         $permission = Permission::factory()->create();
-        $user->givePermissionTo($permission);
-        $user->givePermissionTo($permission);
+        $user->givePermissionsTo($permission);
+        $user->givePermissionsTo($permission);
 
         $this->assertCount(1, $user->fresh()->permissions);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -21,6 +22,25 @@ class AccessTokenTest extends TestCase
         $dbToken = PersonalAccessToken::findToken($token);
 
         $this->assertTrue($dbToken->tokenable->is($user));
+    }
+
+    public function test_user_permissions_are_assigned_as_abilities_to_the_token()
+    {
+        $user = User::factory()->create();
+        $permissions = Permission::factory()->count(3)->createMany();
+        // Assign only two permissions to the user
+        $user->givePermissionsTo([$permissions[0], $permissions[1]]);
+
+        $this->assertCount(2, $user->fresh()->permissions);
+
+        $response = $this->login(user: $user);
+
+        $token = $response->json('token');
+        $dbToken = PersonalAccessToken::findToken($token);
+
+        $this->assertTrue($dbToken->can($permissions[0]->name));
+        $this->assertTrue($dbToken->can($permissions[1]->name));
+        $this->assertFalse($dbToken->can($permissions[2]->name));
     }
 
     public function test_password_is_required()
