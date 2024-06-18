@@ -20,13 +20,16 @@ class DeleteArticlesTest extends TestCase
         $this->assertDatabaseCount('articles', 1);
 
         $this->deleteJsonApi(route('api.v1.articles.update', $article))
-            ->assertUnauthorized();
-        // ->assertJsonApiError('Unauthenticated.', 401);
+            ->assertJsonApiError(
+                title: 'Unauthenticated',
+                detail: 'This action requires authentication.',
+                status: 401,
+            );
 
         $this->assertDatabaseCount('articles', 1);
     }
 
-    public function test_can_delete_owned_article(): void
+    public function test_can_delete_owned_articles(): void
     {
         $article = Article::factory()->create();
 
@@ -37,5 +40,18 @@ class DeleteArticlesTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseCount('articles', 0);
+    }
+
+    public function test_cannot_delete_other_users_articles(): void
+    {
+        $article = Article::factory()->create();
+
+        $this->assertDatabaseCount('articles', 1);
+
+        $this->actingAs()
+            ->deleteJsonApi(route('api.v1.articles.destroy', $article))
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('articles', 1);
     }
 }

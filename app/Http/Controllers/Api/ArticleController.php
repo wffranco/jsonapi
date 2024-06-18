@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Resources\ArticleResource;
+use App\JsonApi\JsonApiAuthorize;
 use App\JsonApi\JsonApiResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class ArticleController extends Controller implements HasMiddleware
 {
+    use JsonApiAuthorize;
+
     public static function middleware(): array
     {
         return [
@@ -53,6 +56,7 @@ class ArticleController extends Controller implements HasMiddleware
 
     public function update(StoreArticleRequest $request, Article $article): JsonApiResource
     {
+        $this->authorize('update', $article);
         $article->update($request->validated('attributes'));
 
         return ArticleResource::make($article);
@@ -60,6 +64,7 @@ class ArticleController extends Controller implements HasMiddleware
 
     public function destroy(Article $article): Response
     {
+        $this->authorize('delete', $article);
         $article->delete();
 
         return response()->noContent();

@@ -5,13 +5,25 @@ namespace {{ namespace }};
 use {{ rootNamespace }}Http\Controllers\Controller;
 use {{ namespacedRequests }}
 use {{ rootNamespace }}Http\Resources\{{ model }}Resource;
+use {{ rootNamespace }}JsonApi\JsonApiAuthorize;
 use {{ rootNamespace }}JsonApi\JsonApiResource;
 use {{ namespacedModel }};
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class {{ class }} extends Controller
+class {{ class }} extends Controller implements HasMiddleware
 {
+    use JsonApiAuthorize;
+
+    public static function middleware(): array
+    {
+        return [
+            // new Middleware('auth:sanctum', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -37,6 +49,7 @@ class {{ class }} extends Controller
      */
     public function store({{ storeRequest }} $request): JsonApiResource
     {
+        // $this->authorize('create', ${{ modelVariable }});
         ${{ modelVariable }} = {{ model }}::create($request->validated('attributes'));
 
         return {{ model }}Resource::make(${{ modelVariable }});
@@ -47,6 +60,7 @@ class {{ class }} extends Controller
      */
     public function update({{ storeRequest }} $request, {{ model }} ${{ modelVariable }}): JsonApiResource
     {
+        // $this->authorize('update', ${{ modelVariable }});
         ${{ modelVariable }}->update($request->validated('attributes'));
 
         return {{ model }}Resource::make(${{ modelVariable }});
@@ -57,6 +71,7 @@ class {{ class }} extends Controller
      */
     public function destroy({{ model }} ${{ modelVariable }}): Response
     {
+        // $this->authorize('delete', ${{ modelVariable }});
         ${{ modelVariable }}->delete();
         return response()->noContent();
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthorResource;
+use App\JsonApi\JsonApiAuthorize;
 use App\JsonApi\JsonApiResource;
 use App\Models\Article;
 use App\Models\User;
@@ -13,6 +14,8 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class ArticleAuthorController extends Controller implements HasMiddleware
 {
+    use JsonApiAuthorize;
+
     public static function middleware(): array
     {
         return [
@@ -33,6 +36,7 @@ class ArticleAuthorController extends Controller implements HasMiddleware
     public function update(Request $request, Article $article): JsonApiResource
     {
         $request->validate(['data.id' => 'exists:users,id']);
+        $this->authorize('update', $article);
 
         $author = User::find($request->input('data.id'));
         $article->update(['user_id' => $author->id]);

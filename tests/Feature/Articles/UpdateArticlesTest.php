@@ -19,11 +19,14 @@ class UpdateArticlesTest extends TestCase
         $article = Article::factory()->create();
 
         $this->patchJsonApi(route('api.v1.articles.update', $article))
-            ->assertUnauthorized();
-        // ->assertJsonApiError('Unauthenticated.', 401);
+            ->assertJsonApiError(
+                title: 'Unauthenticated',
+                detail: 'This action requires authentication.',
+                status: 401,
+            );
     }
 
-    public function test_can_update_owned_post(): void
+    public function test_can_update_owned_articles(): void
     {
         $article = Article::factory()->create();
 
@@ -36,6 +39,19 @@ class UpdateArticlesTest extends TestCase
             ->assertOk()
             ->assertJsonApiHeaderLocation($article->refresh())
             ->assertJsonApiResource($article, ['title', 'content', 'slug']);
+    }
+
+    public function test_cannot_update_other_users_articles(): void
+    {
+        $article = Article::factory()->create();
+
+        $this->actingAs()
+            ->patchJsonApi(route('api.v1.articles.update', $article), [
+                'title' => 'Title',
+                'content' => 'Content',
+                'slug' => 'slug',
+            ])
+            ->assertForbidden();
     }
 
     public function test_title_is_required(): void
