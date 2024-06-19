@@ -6,10 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TokenResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\ValidationException;
 
-class LoginController extends Controller
+class LoginController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('guest:sanctum'),
+        ];
+    }
+
     public function __invoke(Request $request)
     {
         $request->validate([

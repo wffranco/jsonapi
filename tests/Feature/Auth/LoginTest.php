@@ -8,11 +8,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\PersonalAccessToken;
 use Tests\TestCase;
 
-class AccessTokenTest extends TestCase
+class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_get_access_token()
+    public function test_can_login()
     {
         $user = User::factory()->create();
 
@@ -22,6 +22,24 @@ class AccessTokenTest extends TestCase
         $dbToken = PersonalAccessToken::findToken($token);
 
         $this->assertTrue($dbToken->tokenable->is($user));
+    }
+
+    public function test_cannot_login_if_already_authenticated()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->login(user: $user);
+
+        $token = $response->json('plain-text-token');
+
+        $this->withHeader('Authorization', "Bearer $token")
+            ->login(user: $user)
+            ->assertJsonApiError(
+                title: 'Unauthorized',
+                status: 401,
+            );
+
+        $this->assertCount(1, $user->fresh()->tokens);
     }
 
     public function test_user_permissions_are_assigned_as_abilities_to_the_token()

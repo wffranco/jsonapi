@@ -6,6 +6,7 @@ use App\JsonApi\Exceptions as JsonApi;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,6 +39,9 @@ class Handler
         });
         $this->exceptions->render(function (NotFoundHttpException $e, Request $request) {
             return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+        });
+        $this->exceptions->render(function (UnauthorizedException $e, Request $request) {
+            return (new JsonApi\UnauthorizedException($e->getMessage(), $e->getCode(), $e))->render($request);
         });
         $this->exceptions->render(function (ValidationException $e, Request $request) {
             return (new JsonApi\ValidationException($e->validator))->render($request);
