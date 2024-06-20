@@ -23,18 +23,12 @@ trait Auth
             'email' => $user->email,
             'password' => 'password',
             'device_name' => 'test',
-        ], $data), [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ]);
+        ], $data));
     }
 
     protected function logout()
     {
-        return $this->postJson(route('api.v1.auth.logout'), [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ]);
+        return $this->postJson(route('api.v1.auth.logout'), []);
     }
 
     protected function register(array $data = [], ?User $user = null)
@@ -48,10 +42,7 @@ trait Auth
             'password' => 'password',
             'password_confirmation' => 'password',
             'device_name' => 'test',
-        ], $data)), [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ]);
+        ], $data)));
     }
 
     /**

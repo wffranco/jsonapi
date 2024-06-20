@@ -20,23 +20,23 @@ class ValidateJsonApiDocumentTest extends TestCase
     public function test_all_required_fields_are_validated(): void
     {
         $this->postJson('/test/api/request', [])
-            ->assertJsonApiValidationErrors('data')
-            ->assertJsonApiValidationErrors('data.type')
-            ->assertJsonApiValidationErrors('data.attributes');
+            ->assertJsonValidationErrorFor('data')
+            ->assertJsonValidationErrorFor('data.type')
+            ->assertJsonValidationErrorFor('data.attributes');
         $this->patchJson('/test/api/request', [])
-            ->assertJsonApiValidationErrors('data')
-            ->assertJsonApiValidationErrors('data.type')
-            ->assertJsonApiValidationErrors('data.attributes');
+            ->assertJsonValidationErrorFor('data')
+            ->assertJsonValidationErrorFor('data.type')
+            ->assertJsonValidationErrorFor('data.attributes');
     }
 
     public function test_data_must_be_an_array(): void
     {
         $this->postJson('/test/api/request', [
             'data' => 'not-an-array',
-        ])->assertJsonApiValidationErrors('data');
+        ])->assertJsonValidationErrorFor('data');
         $this->patchJson('/test/api/request', [
             'data' => 'not-an-array',
-        ])->assertJsonApiValidationErrors('data');
+        ])->assertJsonValidationErrorFor('data');
     }
 
     public function test_data_type_must_be_a_string(): void
@@ -45,12 +45,12 @@ class ValidateJsonApiDocumentTest extends TestCase
             'data' => [
                 'type' => [],
             ],
-        ])->assertJsonApiValidationErrors('data.type');
+        ])->assertJsonValidationErrorFor('data.type');
         $this->patchJson('/test/api/request', [
             'data' => [
                 'type' => 0,
             ],
-        ])->assertJsonApiValidationErrors('data.type');
+        ])->assertJsonValidationErrorFor('data.type');
     }
 
     public function test_data_attribute_must_be_an_array(): void
@@ -59,18 +59,18 @@ class ValidateJsonApiDocumentTest extends TestCase
             'data' => [
                 'attributes' => 'not-an-array',
             ],
-        ])->assertJsonApiValidationErrors('data.attributes');
+        ])->assertJsonValidationErrorFor('data.attributes');
         $this->patchJson('/test/api/request', [
             'data' => [
                 'attributes' => 'not-an-array',
             ],
-        ])->assertJsonApiValidationErrors('data.attributes');
+        ])->assertJsonValidationErrorFor('data.attributes');
     }
 
     public function test_data_id_is_required_on_patch_requests(): void
     {
         $this->patchJson('/test/api/request', [])
-            ->assertJsonApiValidationErrors('data.id');
+            ->assertJsonValidationErrorFor('data.id');
     }
 
     public function test_data_id_must_be_a_string_on_patch_requests(): void
@@ -79,7 +79,7 @@ class ValidateJsonApiDocumentTest extends TestCase
             'data' => [
                 'id' => [],
             ],
-        ])->assertJsonApiValidationErrors('data.id');
+        ])->assertJsonValidationErrorFor('data.id');
     }
 
     public function test_only_accepts_valid_json_api_document(): void

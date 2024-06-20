@@ -28,6 +28,14 @@ namespace Illuminate\Database\Eloquent {
     }
 }
 
+namespace Illuminate\Http {
+    /**
+     * @method bool isJsonApi()
+     */
+    class Request extends \Illuminate\Http\Request {
+    }
+}
+
 namespace Illuminate\Testing {
     use Illuminate\Database\Eloquent\Collection;
     use Illuminate\Database\Eloquent\Model;

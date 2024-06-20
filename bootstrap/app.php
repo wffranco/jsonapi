@@ -29,7 +29,5 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        Handler::with($exceptions)
-            ->setRenderJson()
-            ->renderExceptions();
+        Handler::render($exceptions);
     })->create();
