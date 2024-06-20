@@ -32,19 +32,31 @@ class Handler
     public function renderExceptions()
     {
         $this->exceptions->render(function (AuthenticationException $e, Request $request) {
-            return (new JsonApi\AuthenticationException($e->getMessage(), $e->getCode(), $e))->render($request);
+            if (! $request->is('api/v1/auth/*')) {
+                return (new JsonApi\AuthenticationException($e->getMessage(), $e->getCode(), $e))->render($request);
+            }
         });
         $this->exceptions->render(function (BadRequestHttpException $e, Request $request) {
-            return (new JsonApi\BadRequestHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+            if (! $request->is('api/v1/auth/*')) {
+                return (new JsonApi\BadRequestHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+            }
         });
         $this->exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+            if (! $request->is('api/v1/auth/*')) {
+                return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
+            }
         });
         $this->exceptions->render(function (UnauthorizedException $e, Request $request) {
+            if ($request->is('api/v1/auth/*')) {
+                return response()->json(['message' => 'Unauthorized.'], 401, ['Content-Type' => 'application/vnd.api+json']);
+            }
+
             return (new JsonApi\UnauthorizedException($e->getMessage(), $e->getCode(), $e))->render($request);
         });
         $this->exceptions->render(function (ValidationException $e, Request $request) {
-            return (new JsonApi\ValidationException($e->validator))->render($request);
+            if (! $request->is('api/v1/auth/*')) {
+                return (new JsonApi\ValidationException($e->validator))->render($request);
+            }
         });
 
         return $this;

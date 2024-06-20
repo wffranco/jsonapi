@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    use RefreshDatabase;
+    use Auth, RefreshDatabase;
 
     public function test_can_login()
     {
@@ -27,17 +27,9 @@ class LoginTest extends TestCase
     public function test_cannot_login_if_already_authenticated()
     {
         $user = User::factory()->create();
-
-        $response = $this->login(user: $user);
-
-        $token = $response->json('plain-text-token');
-
-        $this->withHeader('Authorization', "Bearer $token")
-            ->login(user: $user)
-            ->assertJsonApiError(
-                title: 'Unauthorized',
-                status: 401,
-            );
+        $this->logged($user)->login(user: $user)
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthorized.']);
 
         $this->assertCount(1, $user->fresh()->tokens);
     }
@@ -51,9 +43,7 @@ class LoginTest extends TestCase
 
         $this->assertCount(2, $user->fresh()->permissions);
 
-        $response = $this->login(user: $user);
-
-        $token = $response->json('token');
+        $token = $this->token(user: $user);
         $dbToken = PersonalAccessToken::findToken($token);
 
         $this->assertTrue($dbToken->can($permissions[0]->name));
@@ -101,22 +91,5 @@ class LoginTest extends TestCase
     {
         $this->login(['device_name' => 123])
             ->assertJsonValidationErrors(['device_name' => 'string']);
-    }
-
-    // Helper methods
-
-    protected function login(array $data = [], ?User $user = null)
-    {
-        $user ??= User::factory()->make(); // Unregistered user
-
-        // Add credentials and headers to the request
-        return $this->postJson(route('api.v1.login'), array_merge([
-            'email' => $user->email,
-            'password' => 'password',
-            'device_name' => 'test',
-        ], $data), [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ]);
     }
 }
