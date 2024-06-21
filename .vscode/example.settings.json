@@ -1,0 +1,12 @@
+{
+    "emeraldwalk.runonsave": {
+        "autoClearConsole": true,
+        "commands": [
+            {
+                "match": "\\.php$",
+                "notMatch": ".*_ide_helper.*\\.php$",
+                "cmd": "sail pint ${relativeFile}"
+            }
+        ]
+    }
+}
