@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Category;
 use App\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
 class StoreArticleRequest extends FormRequest
@@ -42,21 +40,5 @@ class StoreArticleRequest extends FormRequest
                 Rule::exists('categories', 'slug'),
             ],
         ];
-    }
-
-    public function validated($key = null, $default = null)
-    {
-        $validated = parent::validated('data', []);
-
-        $slug = Arr::get($validated, 'relationships.category.data.id');
-        if ($category = Category::where('slug', $slug)->first()) {
-            Arr::set($validated, 'attributes.category_id', $category->id);
-        }
-
-        if ($author_id = Arr::get($validated, 'relationships.author.data.id')) {
-            Arr::set($validated, 'attributes.user_id', $author_id);
-        }
-
-        return Arr::get($validated, $key, $default);
     }
 }

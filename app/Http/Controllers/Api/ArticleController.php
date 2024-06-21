@@ -8,11 +8,13 @@ use App\Http\Resources\ArticleResource;
 use App\JsonApi\JsonApiAuthorize;
 use App\JsonApi\JsonApiResource;
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Arr;
 
 class ArticleController extends Controller implements HasMiddleware
 {
@@ -50,7 +52,7 @@ class ArticleController extends Controller implements HasMiddleware
     public function store(StoreArticleRequest $request): JsonApiResource
     {
         $this->authorize('create', Article::class);
-        $article = Article::create($request->validated('attributes'));
+        $article = Article::create($this->transform($request));
 
         return ArticleResource::make($article);
     }
@@ -58,7 +60,7 @@ class ArticleController extends Controller implements HasMiddleware
     public function update(StoreArticleRequest $request, Article $article): JsonApiResource
     {
         $this->authorize('update', $article);
-        $article->update($request->validated('attributes'));
+        $article->update($this->transform($request));
 
         return ArticleResource::make($article);
     }
@@ -69,5 +71,21 @@ class ArticleController extends Controller implements HasMiddleware
         $article->delete();
 
         return response()->noContent();
+    }
+
+    protected function transform(Request $request): array
+    {
+        $validated = $request->validated('data');
+
+        $slug = Arr::get($validated, 'relationships.category.data.id');
+        if ($category = Category::where('slug', $slug)->first()) {
+            Arr::set($validated, 'attributes.category_id', $category->id);
+        }
+
+        if ($author_id = Arr::get($validated, 'relationships.author.data.id')) {
+            Arr::set($validated, 'attributes.user_id', $author_id);
+        }
+
+        return $validated['attributes'];
     }
 }
