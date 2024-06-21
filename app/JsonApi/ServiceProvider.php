@@ -24,9 +24,6 @@ class ServiceProvider extends BaseServiceProvider
     {
         Builder::mixin(new JsonApiEloquentBuilderMixin());
         TestResponse::mixin(new JsonApiTestResponseMixin());
-        Request::macro('isJsonApi', function () {
-            /** @var Request $this */
-            return $this->header('Accept') === 'application/vnd.api+json';
-        });
+        Request::mixin(new JsonApiRequestMixin());
     }
 }

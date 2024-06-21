@@ -3,6 +3,7 @@
 namespace Tests\Feature\Articles;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -97,5 +98,29 @@ class UpdateArticlesTest extends TestCase
             'slug' => $articles[0]->slug,
         ])
             ->assertOk();
+    }
+
+    public function test_can_update_owned_article_with_relationships(): void
+    {
+        $article = Article::factory()->create();
+        $author = User::factory()->create();
+        $category = Category::factory()->create();
+        $this->actingAs($article->author, ['article:update'])
+            ->patchJsonApi(route('api.v1.articles.update', $article), [
+                'attributes' => [
+                    'title' => 'Title',
+                    'content' => 'Content',
+                    'slug' => 'slug',
+                ],
+                'relationships' => [
+                    'author' => $author,
+                    'category' => $category,
+                ],
+            ])
+            ->assertOk()
+            ->assertJsonApiHeaderLocation($article->refresh());
+
+        $this->assertTrue($author->is($article->author));
+        $this->assertTrue($category->is($article->category));
     }
 }

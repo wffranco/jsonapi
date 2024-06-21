@@ -14,7 +14,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Arr;
 
 class ArticleController extends Controller implements HasMiddleware
 {
@@ -75,17 +74,17 @@ class ArticleController extends Controller implements HasMiddleware
 
     protected function transform(Request $request): array
     {
-        $validated = $request->validated('data');
+        $attributes = $request->getAttributes();
 
-        $slug = Arr::get($validated, 'relationships.category.data.id');
-        if ($category = Category::where('slug', $slug)->first()) {
-            Arr::set($validated, 'attributes.category_id', $category->id);
+        $slug = $request->getRelationshipId('category');
+        if ($slug && $category = Category::where('slug', $slug)->first()) {
+            $attributes['category_id'] = $category->id;
         }
 
-        if ($author_id = Arr::get($validated, 'relationships.author.data.id')) {
-            Arr::set($validated, 'attributes.user_id', $author_id);
+        if ($author_id = $request->getRelationshipId('author')) {
+            $attributes['user_id'] = $author_id;
         }
 
-        return $validated['attributes'];
+        return $attributes;
     }
 }
