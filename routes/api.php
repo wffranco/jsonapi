@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\RegisterController;
@@ -40,3 +41,6 @@ Route::prefix('articles')->name('articles.')->group(function () {
     Route::patch('{article}/relationships/category', [ArticleCategoryController::class, 'update'])->name('relationships.category');
     Route::get('{article}/category', [ArticleCategoryController::class, 'show'])->name('category');
 });
+
+Route::apiResource('comments', CommentController::class)
+    ->only('index', 'show');
