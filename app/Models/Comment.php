@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @template TModel of Model
  *
  * @property int $id
+ * @property int $article_id
+ * @property string $user_id
  * @property string $body
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -19,4 +21,10 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'article_id',
+        'user_id',
+        'body',
+    ];
 }
