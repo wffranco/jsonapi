@@ -50,4 +50,83 @@ class CreateCommentsTest extends TestCase
             'user_id' => $user->id,
         ]);
     }
+
+    public function test_body_is_required()
+    {
+        $user = User::factory()->create();
+        $article = Article::factory()->create();
+        $this->actingAs($user, ['comment:create'])
+            ->postJsonApi(route('api.v1.comments.store'), [
+                'attributes' => [
+                    'body' => null,
+                ],
+                'relationships' => [
+                    'article' => $article,
+                    'author' => $user,
+                ],
+            ])
+            ->assertJsonApiValidationErrors('body');
+    }
+
+    public function test_article_relationship_is_required()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, ['comment:create'])
+            ->postJsonApi(route('api.v1.comments.store'), [
+                'attributes' => [
+                    'body' => 'This is a comment',
+                ],
+                'relationships' => [
+                    'author' => $user,
+                ],
+            ])
+            ->assertJsonApiValidationErrors('relationships.article');
+    }
+
+    public function test_article_relationship_must_exist()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, ['comment:create'])
+            ->postJsonApi(route('api.v1.comments.store'), [
+                'attributes' => [
+                    'body' => 'This is a comment',
+                ],
+                'relationships' => [
+                    'article.data.id' => 'non-existing-article-slug',
+                    'author' => $user,
+                ],
+            ])
+            ->assertJsonApiValidationErrors('relationships.article');
+    }
+
+    public function test_author_relationship_is_required()
+    {
+        $article = Article::factory()->create();
+        $this->actingAs(null, ['comment:create'])
+            ->postJsonApi(route('api.v1.comments.store'), [
+                'attributes' => [
+                    'body' => 'This is a comment',
+                ],
+                'relationships' => [
+                    'article' => $article,
+                ],
+            ])
+            ->assertJsonApiValidationErrors('relationships.author');
+    }
+
+    public function test_author_relationship_must_exist()
+    {
+        $article = Article::factory()->create();
+        $this->actingAs(null, ['comment:create'])
+            ->postJsonApi(route('api.v1.comments.store'), [
+                'attributes' => [
+                    'body' => 'This is a comment',
+                ],
+                'relationships' => [
+                    'article' => $article,
+                    'author.data.id' => 999,
+                ],
+            ])
+            ->assertJsonApiValidationErrors('relationships.author');
+    }
 }

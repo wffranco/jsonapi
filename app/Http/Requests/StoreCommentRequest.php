@@ -23,8 +23,8 @@ class StoreCommentRequest extends FormRequest
     {
         return [
             'data.attributes.body' => ['required'],
-            'data.relationships.article.data.id' => [],
-            'data.relationships.author.data.id' => [],
+            'data.relationships.article.data.id' => ['required', 'exists:articles,slug'],
+            'data.relationships.author.data.id' => ['required', 'exists:users,id'],
         ];
     }
 }
