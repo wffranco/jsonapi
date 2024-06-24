@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @template TModel of Model
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $body
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read Article $article
+ * @property-read User $author
  *
  * @method static CommentFactory<static> factory(...$parameters)
  */
@@ -27,4 +30,14 @@ class Comment extends Model
         'user_id',
         'body',
     ];
+
+    public function article(): BelongsTo
+    {
+        return $this->belongsTo(Article::class);
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

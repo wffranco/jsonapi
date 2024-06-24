@@ -43,4 +43,4 @@ Route::prefix('articles')->name('articles.')->group(function () {
 });
 
 Route::apiResource('comments', CommentController::class)
-    ->only('index', 'show', 'store');
+    ->only('index', 'show', 'store', 'update');

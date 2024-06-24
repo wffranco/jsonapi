@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Resources\CommentResource;
+use App\JsonApi\JsonApiAuthorize;
 use App\JsonApi\JsonApiResource;
 use App\Models\Article;
 use App\Models\Comment;
@@ -16,6 +17,8 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class CommentController extends Controller implements HasMiddleware
 {
+    use JsonApiAuthorize;
+
     public static function middleware(): array
     {
         return [
@@ -56,8 +59,9 @@ class CommentController extends Controller implements HasMiddleware
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Comment $comment): JsonApiResource
+    public function update(StoreCommentRequest $request, Comment $comment): JsonApiResource
     {
+        $this->authorize('update', $comment);
         $comment->update($this->transform($request));
 
         return CommentResource::make($comment);

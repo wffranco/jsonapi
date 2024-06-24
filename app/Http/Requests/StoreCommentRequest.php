@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCommentRequest extends FormRequest
 {
@@ -23,8 +24,16 @@ class StoreCommentRequest extends FormRequest
     {
         return [
             'data.attributes.body' => ['required'],
-            'data.relationships.article.data.id' => ['required', 'exists:articles,slug'],
-            'data.relationships.author.data.id' => ['required', 'exists:users,id'],
+            'data.relationships.article.data.id' => [
+                Rule::requiredIf(! $this->route('comment')),
+                'string',
+                Rule::exists('articles', 'slug'),
+            ],
+            'data.relationships.author.data.id' => [
+                Rule::requiredIf(! $this->route('comment')),
+                'string',
+                Rule::exists('users', 'id'),
+            ],
         ];
     }
 }
