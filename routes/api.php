@@ -42,5 +42,4 @@ Route::prefix('articles')->name('articles.')->group(function () {
     Route::get('{article}/category', [ArticleCategoryController::class, 'show'])->name('category');
 });
 
-Route::apiResource('comments', CommentController::class)
-    ->only('index', 'show', 'store', 'update');
+Route::apiResource('comments', CommentController::class);
