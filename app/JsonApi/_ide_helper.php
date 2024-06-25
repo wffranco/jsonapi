@@ -40,6 +40,21 @@ namespace Illuminate\Http {
     }
 }
 
+namespace Illuminate\Routing {
+    class Route extends \Illuminate\Routing\Route {
+        private static \App\JsonApi\JsonApiRouteMixin $mixin;
+        /** @return void */
+        public static function apiRelationshipResource(string $uri, string $controller, array $only = ['index', 'show', 'update'], array $except = [])
+        { return static::$mixin->apiRelationshipResource()($uri, $controller, $only, $except); }
+    }
+}
+
+namespace Illuminate\Support\Facades {
+    /** @mixin \Illuminate\Routing\Route */
+    class Route extends \Illuminate\Support\Facades\Route {
+    }
+}
+
 namespace Illuminate\Testing {
     use Illuminate\Database\Eloquent\Collection;
     use Illuminate\Database\Eloquent\Model;

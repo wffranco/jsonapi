@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CommentArticleController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
@@ -32,14 +33,9 @@ Route::apiResource('categories', CategoryController::class)
     ->except('store', 'update', 'destroy');
 
 Route::apiResource('articles', ArticleController::class);
-Route::prefix('articles')->name('articles.')->group(function () {
-    Route::get('{article}/relationships/author', [ArticleAuthorController::class, 'index'])->name('relationships.author');
-    Route::patch('{article}/relationships/author', [ArticleAuthorController::class, 'update'])->name('relationships.author');
-    Route::get('{article}/author', [ArticleAuthorController::class, 'show'])->name('author');
-
-    Route::get('{article}/relationships/category', [ArticleCategoryController::class, 'index'])->name('relationships.category');
-    Route::patch('{article}/relationships/category', [ArticleCategoryController::class, 'update'])->name('relationships.category');
-    Route::get('{article}/category', [ArticleCategoryController::class, 'show'])->name('category');
-});
+Route::apiRelationshipResource('articles/author', ArticleAuthorController::class);
+Route::apiRelationshipResource('articles/category', ArticleCategoryController::class);
 
 Route::apiResource('comments', CommentController::class);
+Route::apiRelationshipResource('comments/article', CommentArticleController::class);
+Route::apiRelationshipResource('comments/author', CommentController::class);

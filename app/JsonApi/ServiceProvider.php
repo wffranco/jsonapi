@@ -4,6 +4,7 @@ namespace App\JsonApi;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Illuminate\Testing\TestResponse;
 
@@ -25,5 +26,6 @@ class ServiceProvider extends BaseServiceProvider
         Builder::mixin(new JsonApiEloquentBuilderMixin());
         TestResponse::mixin(new JsonApiTestResponseMixin());
         Request::mixin(new JsonApiRequestMixin());
+        Route::mixin(new JsonApiRouteMixin());
     }
 }
