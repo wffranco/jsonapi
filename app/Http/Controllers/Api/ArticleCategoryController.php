@@ -32,6 +32,8 @@ class ArticleCategoryController extends Controller implements HasMiddleware
 
     public function update(Request $request, Article $article): JsonApiResource
     {
+        $request->validate(['data.id' => 'exists:categories,slug']);
+
         $slug = $request->input('data.id');
         $category = Category::where('slug', $slug)->first();
         $category->articles()->save($article);

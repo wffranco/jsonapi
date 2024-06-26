@@ -32,6 +32,8 @@ class ArticleAuthorController extends Controller implements HasMiddleware
 
     public function update(Request $request, Article $article): JsonApiResource
     {
+        $request->validate(['data.id' => 'exists:users,id']);
+
         $author = User::find($request->input('data.id'));
         $article->update(['user_id' => $author->id]);
 

@@ -46,4 +46,21 @@ class AuthorRelationshipTest extends TestCase
             'user_id' => $author->id,
         ]);
     }
+
+    public function test_author_must_exists_in_database_when_updating()
+    {
+        $article = Article::factory()->createOne();
+
+        $this->actingAs($article->author)
+            ->patchJsonApi(
+                route('api.v1.articles.relationships.author', $article),
+                ['data' => ['type' => 'users', 'id' => 999]],
+            )
+            ->assertJsonApiValidationErrors('data.id');
+
+        $this->assertDatabaseHas('articles', [
+            'id' => $article->id,
+            'user_id' => $article->user_id,
+        ]);
+    }
 }

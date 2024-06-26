@@ -3,7 +3,10 @@
 namespace App\JsonApi\Tests;
 
 use App\JsonApi\JsonApiDocument;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Testing\TestResponse;
+use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
@@ -28,6 +31,15 @@ trait JsonApiRequests
                 }
             }
         }
+
+        return $this;
+    }
+
+    public function actingAs(?UserContract $user = null, $guard = null): static
+    {
+        Sanctum::actingAs(
+            $user ?? User::factory()->createOne(),
+        );
 
         return $this;
     }
