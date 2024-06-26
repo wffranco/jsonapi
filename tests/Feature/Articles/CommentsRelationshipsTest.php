@@ -27,4 +27,14 @@ class CommentsRelationshipsTest extends TestCase
             ->assertJsonCount(0, 'data')
             ->assertExactJson(['data' => []]);
     }
+
+    public function test_can_fetch_the_associated_comments_resources()
+    {
+        $article = Article::factory()->hasComments(2)->createOne();
+        $this->getJsonApi(route('api.v1.articles.comments', $article))
+            ->assertJsonCount(2, 'data')
+            ->assertJson([
+                'data' => CommentResource::getCollectionResources($article->comments),
+            ]);
+    }
 }

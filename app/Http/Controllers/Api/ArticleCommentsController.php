@@ -27,12 +27,11 @@ class ArticleCommentsController extends Controller implements HasMiddleware
         return CommentResource::collectionIdentifiers($article->comments);
     }
 
-    public function show($article): JsonApiResource
+    public function show($article): AnonymousResourceCollection
     {
-        // $article = Article::where('slug', $article)->firstOrFail();
-        $article = Article::findOrFail($article);
+        $article = Article::where('slug', $article)->firstOrFail();
 
-        return ArticleResource::make($article);
+        return CommentResource::collection($article->comments);
     }
 
     public function update(Request $request, Article $article): AnonymousResourceCollection

@@ -42,11 +42,7 @@ abstract class JsonApiResource extends JsonResource
             }
         }
 
-        $collection->with['links'] = [
-            'self' => method_exists($resources, 'path')
-                ? $resources->path()
-                : route('api.v1.'.$resources[0]->getResourceType().'.index'),
-        ];
+        $collection->with['links'] = ['self' => url(request()->path())];
 
         return $collection;
     }
@@ -69,6 +65,11 @@ abstract class JsonApiResource extends JsonResource
             : $this->toArray(request());
 
         return Arr::get($data, $key, $default);
+    }
+
+    public static function getCollectionResources(Collection|LengthAwarePaginator $resources): array
+    {
+        return static::collection($resources)->toArray(request());
     }
 
     public static function getIdentifier(Model|LengthAwarePaginator $resource): array
