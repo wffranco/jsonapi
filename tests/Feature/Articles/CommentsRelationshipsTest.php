@@ -19,4 +19,12 @@ class CommentsRelationshipsTest extends TestCase
             ->assertJsonCount(2, 'data')
             ->assertExactJson(['data' => CommentResource::getIdentifiers($article->comments)]);
     }
+
+    public function test_returns_an_empty_data_array_when_the_article_has_no_comments()
+    {
+        $article = Article::factory()->createOne();
+        $this->getJsonApi(route('api.v1.articles.relationships.comments', $article))
+            ->assertJsonCount(0, 'data')
+            ->assertExactJson(['data' => []]);
+    }
 }
