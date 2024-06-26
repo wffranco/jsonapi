@@ -3,6 +3,8 @@
 namespace App\JsonApi;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -11,7 +13,7 @@ use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
 
 /**
- * @template TModel of \Illuminate\Database\Eloquent\Model
+ * @template TModel of Model
  *
  * @property TModel|LengthAwarePaginator $resource
  */
@@ -22,10 +24,9 @@ abstract class JsonApiResource extends JsonResource
     abstract public function allowedAttributes(): array;
 
     /**
-     * @param  TModel|LengthAwarePaginator  $resources
-     * @return AnonymousResourceCollection
+     * @param  Collection<TModel>|LengthAwarePaginator  $resources
      */
-    public static function collection($resources)
+    public static function collection($resources): AnonymousResourceCollection
     {
         $collection = parent::collection($resources);
 
@@ -50,6 +51,17 @@ abstract class JsonApiResource extends JsonResource
         return $collection;
     }
 
+    public static function collectionIdentifiers(Collection|LengthAwarePaginator $resources): AnonymousResourceCollection
+    {
+        $collection = parent::collection($resources);
+
+        foreach ($collection->getIterator() as $resource) {
+            $resource->identifier();
+        }
+
+        return $collection;
+    }
+
     public function get(?string $key = null, $default = null): array
     {
         $data = static::$wrap
@@ -59,12 +71,19 @@ abstract class JsonApiResource extends JsonResource
         return Arr::get($data, $key, $default);
     }
 
-    /**
-     * @param  TModel|LengthAwarePaginator  $resource
-     */
-    public static function getIdentifier($resource): array
+    public static function getIdentifier(Model|LengthAwarePaginator $resource): array
     {
         return static::make($resource)->identifier()->get();
+    }
+
+    /**
+     * @param  Collection<TModel>|LengthAwarePaginator  $resources
+     */
+    public static function getIdentifiers(Collection|LengthAwarePaginator $resource): array
+    {
+        return $resource->map(
+            fn (Model $model) => static::getIdentifier($model)[static::$wrap]
+        )->all();
     }
 
     public function getIncludes(): array

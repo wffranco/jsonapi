@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CommentResource;
+use App\JsonApi\JsonApiAuthorize;
+use App\Models\Article;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ArticleCommentsController extends Controller implements HasMiddleware
+{
+    use JsonApiAuthorize;
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum', only: ['update']),
+        ];
+    }
+
+    public function index(Article $article): AnonymousResourceCollection
+    {
+        return CommentResource::collectionIdentifiers($article->comments);
+    }
+
+    public function show($article): JsonApiResource
+    {
+        // $article = Article::where('slug', $article)->firstOrFail();
+        $article = Article::findOrFail($article);
+
+        return ArticleResource::make($article);
+    }
+
+    public function update(Request $request, Article $article): AnonymousResourceCollection
+    {
+        return CommentResource::collection($article->comments);
+    }
+}

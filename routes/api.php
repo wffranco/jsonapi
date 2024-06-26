@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ArticleAuthorController;
 use App\Http\Controllers\Api\ArticleCategoryController;
+use App\Http\Controllers\Api\ArticleCommentsController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
@@ -36,6 +37,7 @@ Route::apiResource('categories', CategoryController::class)
 Route::apiResource('articles', ArticleController::class);
 Route::apiRelationshipResource('articles/author', ArticleAuthorController::class);
 Route::apiRelationshipResource('articles/category', ArticleCategoryController::class);
+Route::apiRelationshipResource('articles/comments', ArticleCommentsController::class);
 
 Route::apiResource('comments', CommentController::class);
 Route::apiRelationshipResource('comments/article', CommentArticleController::class);

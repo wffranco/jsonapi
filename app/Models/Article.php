@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -19,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Carbon\Carbon $updated_at
  * @property-read User $author
  * @property-read Category $category
+ * @property-read Collection<Comment> $comments
  *
  * @method static ArticleFactory<static> factory($count = null, $state = [])
  * @method static static newModelQuery()
@@ -82,6 +85,11 @@ class Article extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function scopeCategory(Builder|self $query, string $categories)

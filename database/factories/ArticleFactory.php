@@ -7,6 +7,10 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @method static Article createOne(array $array)
+ * @method static hasComments(int $int)
+ */
 class ArticleFactory extends Factory
 {
     /**
