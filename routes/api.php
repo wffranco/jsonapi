@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentArticleController;
+use App\Http\Controllers\Api\CommentAuthorController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
@@ -38,4 +39,4 @@ Route::apiRelationshipResource('articles/category', ArticleCategoryController::c
 
 Route::apiResource('comments', CommentController::class);
 Route::apiRelationshipResource('comments/article', CommentArticleController::class);
-Route::apiRelationshipResource('comments/author', CommentController::class);
+Route::apiRelationshipResource('comments/author', CommentAuthorController::class);

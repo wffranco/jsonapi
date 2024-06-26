@@ -2,6 +2,7 @@
 
 namespace App\JsonApi;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -13,7 +14,7 @@ class JsonApiRouteMixin
 {
     public function apiRelationshipResource()
     {
-        return function (string $uri, string $controller, array $only = ['index', 'show', 'update'], array $except = []) {
+        return function (string $uri, Closure|string $controller, array $only = ['index', 'show', 'update'], array $except = []) {
             $methods = collect(array_diff($only, $except));
             // $uri has the format: `<model>/<relationship>`. the key is the model name in singular form.
             [$model, $relationship] = explode('/', $uri);

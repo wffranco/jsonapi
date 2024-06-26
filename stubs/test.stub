@@ -12,8 +12,6 @@ class {{ class }} extends TestCase
 
     public function test_example(): void
     {
-        $response = $this->getJsonApi('/api/v1/info');
-
-        $response->assertStatus(200);
+        static::markTestSkipped('This is a test example, nothing to do right now.');
     }
 }

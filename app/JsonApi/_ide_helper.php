@@ -41,10 +41,12 @@ namespace Illuminate\Http {
 }
 
 namespace Illuminate\Routing {
+    use Closure;
+
     class Route extends \Illuminate\Routing\Route {
         private static \App\JsonApi\JsonApiRouteMixin $mixin;
         /** @return void */
-        public static function apiRelationshipResource(string $uri, string $controller, array $only = ['index', 'show', 'update'], array $except = [])
+        public static function apiRelationshipResource(string $uri, Closure|string $controller, array $only = ['index', 'show', 'update'], array $except = [])
         { return static::$mixin->apiRelationshipResource()($uri, $controller, $only, $except); }
     }
 }
