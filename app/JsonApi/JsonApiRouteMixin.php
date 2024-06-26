@@ -18,10 +18,13 @@ class JsonApiRouteMixin
             // $uri has the format: `<model>/<relationship>`. the key is the model name in singular form.
             [$model, $relationship] = explode('/', $uri);
             $key = '{'.Str::singular($model).'}';
-            Route::controller($controller)->prefix("$model/$key")->name($model.'.')->group(function () use ($relationship, $methods) {
-                $methods->contains('index') && Route::get('relationships/'.$relationship, 'index')->name('relationships.'.$relationship);
-                $methods->contains('update') && Route::patch('relationships/'.$relationship, 'update')->name('relationships.'.$relationship);
-                $methods->contains('show') && Route::get($relationship, 'show')->name($relationship);
+            $route = Route::prefix("$model/$key")->name($model.'.');
+            $callable = is_string($controller) ? null : $controller;
+            ! $callable && $route = $route->controller($controller);
+            $route->group(function () use ($callable, $relationship, $methods) {
+                $methods->contains('index') && Route::get('relationships/'.$relationship, $callable ?? 'index')->name('relationships.'.$relationship);
+                $methods->contains('update') && Route::patch('relationships/'.$relationship, $callable ?? 'update')->name('relationships.'.$relationship);
+                $methods->contains('show') && Route::get($relationship, $callable ?? 'show')->name($relationship);
             });
         };
     }
