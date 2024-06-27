@@ -39,6 +39,37 @@ class ValidateJsonApiDocumentTest extends TestCase
         ])->assertJsonValidationErrorFor('data');
     }
 
+    public function test_data_type_is_required(): void
+    {
+        $this->postJson('/test/api/request', [
+            'data' => [
+                'type' => null,
+            ],
+        ])->assertJsonValidationErrorFor('data.type');
+        $this->patchJson('/test/api/request', [
+            'data' => [
+                'type' => null,
+            ],
+        ])->assertJsonValidationErrorFor('data.type');
+
+        $this->patchJson('/test/api/request', [
+            'data' => [
+                [
+                    'type' => 'test',
+                    'id' => '1',
+                ],
+            ],
+        ])->assertSuccessful();
+        $this->patchJson('/test/api/request', [
+            'data' => [
+                [
+                    'type' => 'test',
+                    'id' => null,
+                ],
+            ],
+        ])->assertJsonValidationErrorFor('data.0.id');
+    }
+
     public function test_data_type_must_be_a_string(): void
     {
         $this->postJson('/test/api/request', [

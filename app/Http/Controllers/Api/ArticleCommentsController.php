@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\JsonApi\JsonApiAuthorize;
 use App\Models\Article;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -36,6 +37,15 @@ class ArticleCommentsController extends Controller implements HasMiddleware
 
     public function update(Request $request, Article $article): AnonymousResourceCollection
     {
-        return CommentResource::collection($article->comments);
+        $request->validate([
+            'data.*.type' => ['required', 'in:comments'],
+            'data.*.id' => ['required', 'distinct'],
+        ]);
+        $comments = Comment::find($request->input('data.*.id'));
+        $this->authorize('update', $comments);
+
+        $article->comments()->saveMany($comments);
+
+        return CommentResource::collection($comments);
     }
 }

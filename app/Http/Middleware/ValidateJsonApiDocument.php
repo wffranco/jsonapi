@@ -20,15 +20,23 @@ class ValidateJsonApiDocument
         if ($request->isMethod('POST') || $request->isMethod('PATCH')) {
             $request->validate([
                 'data' => ['required', 'array'],
-                'data.type' => ['required', 'string'],
+                'data.type' => [
+                    'required_without:data.0.type',
+                    'string',
+                ],
                 'data.attributes' => [
-                    Rule::requiredIf(! Str::contains($request->url(), 'relationships')),
+                    Rule::requiredIf(! Str::contains($request->url(), 'relationships') && $request->isNotFilled('data.0.type')),
                     'array',
                 ],
                 'data.id' => [
-                    Rule::requiredIf($request->isMethod('PATCH')),
+                    Rule::requiredIf($request->isMethod('PATCH') && $request->isNotFilled('data.0.type')),
                     'string',
                 ],
+                'data.*.type' => [
+                    Rule::requiredIf($request->isMethod('PATCH') && $request->isNotFilled('data.type')),
+                    'string',
+                ],
+                'data.*.id' => ['required_with:data.*.type', 'string'],
             ]);
         }
 
