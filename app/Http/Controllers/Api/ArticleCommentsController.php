@@ -39,7 +39,7 @@ class ArticleCommentsController extends Controller implements HasMiddleware
     {
         $request->validate([
             'data.*.type' => ['required', 'in:comments'],
-            'data.*.id' => ['required', 'distinct'],
+            'data.*.id' => ['required', 'distinct', 'exists:comments,id'],
         ]);
         $comments = Comment::find($request->input('data.*.id'));
         $this->authorize('update', $comments);

@@ -67,4 +67,20 @@ class CommentsRelationshipsTest extends TestCase
         $this->assertTrue($article->comments->contains($comments[0]));
         $this->assertTrue($article->comments->contains($comments[1]));
     }
+
+    public function test_comments_must_exists_in_database_when_updating()
+    {
+        $article = Article::factory()->createOne();
+
+        $author = User::factory()->create();
+
+        $this->actingAs($author, ['comment:update'])
+            ->patchJsonApi(
+                route('api.v1.articles.relationships.comments', $article),
+                ['data' => [['type' => 'comments', 'id' => '999']]],
+            )
+            ->assertJsonApiValidationErrors('data.0.id');
+
+        $this->assertDatabaseEmpty('comments');
+    }
 }
