@@ -5,6 +5,7 @@ namespace App\JsonApi;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @mixin Request
@@ -37,6 +38,24 @@ class JsonApiRequestMixin
             $relationship = $this->validatedData('relationships', []);
 
             return Arr::get($relationship, $key, $default);
+        };
+    }
+
+    public function getResourceId()
+    {
+        return function (): string {
+            return $this->hasJsonApiContent('data.id')
+                ? $this->input('data.id')
+                : Str::of($this->path())->afterNext('api/v1/')->afterNext('/')->before('/');
+        };
+    }
+
+    public function getResourceType()
+    {
+        return function (): string {
+            return $this->hasJsonApiContent('data.type')
+                ? $this->input('data.type')
+                : Str::of($this->path())->afterNext('api/v1/')->before('/');
         };
     }
 
