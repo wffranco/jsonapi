@@ -20,11 +20,12 @@ class ArticleResource extends JsonApiResource
         return [
             AuthorResource::make($this->whenLoaded('author')),
             CategoryResource::make($this->whenLoaded('category')),
+            CommentResource::collection($this->whenLoaded('comments')),
         ];
     }
 
     public function getRelationshipKeys(): array
     {
-        return ['author', 'category'];
+        return ['author', 'category', 'comments'];
     }
 }

@@ -41,7 +41,7 @@ class ArticleController extends Controller implements HasMiddleware
     public function show($article): JsonApiResource
     {
         $article = Article::where('slug', $article)
-            ->allowedIncludes(['author', 'category'])
+            ->allowedIncludes(['author', 'category', 'comments'])
             ->sparseFields(['title', 'content', 'slug'])
             ->firstOrFail();
 

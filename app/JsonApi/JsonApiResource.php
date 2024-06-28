@@ -3,7 +3,6 @@
 namespace App\JsonApi;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,6 +10,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * @template TModel of Model
@@ -31,13 +31,13 @@ abstract class JsonApiResource extends JsonResource
         $collection = parent::collection($resources);
 
         if (request()->filled('include')) {
-            $collection->with['included'] = [];
-            foreach ($resources as $resource) {
+            foreach ($collection->resource as $resource) {
                 foreach ($resource->getIncludes() as $include) {
-                    if ($include->resource instanceof MissingValue) {
-                        continue;
+                    if ($include->resource instanceof Collection) {
+                        $include->resource->each(fn ($r) => $collection->with['included'][] = $r);
+                    } elseif (! ($include->resource instanceof MissingValue)) {
+                        $collection->with['included'][] = $include;
                     }
-                    $collection->with['included'][] = $include;
                 }
             }
         }
@@ -123,12 +123,12 @@ abstract class JsonApiResource extends JsonResource
             return JsonApiDocument::make($this->resource)->get('data');
         }
         if (request()->filled('include')) {
-            $this->with['included'] = [];
             foreach ($this->getIncludes() as $include) {
-                if ($include->resource instanceof MissingValue) {
-                    continue;
+                if ($include->resource instanceof Collection) {
+                    $include->resource->each(fn ($r) => $this->with['included'][] = $r);
+                } elseif (! ($include->resource instanceof MissingValue)) {
+                    $this->with['included'][] = $include;
                 }
-                $this->with['included'][] = $include;
             }
         }
 
