@@ -17,6 +17,6 @@ class CommentResource extends JsonApiResource
 
     public function getRelationshipKeys(): array
     {
-        return [];
+        return ['article', 'author'];
     }
 }

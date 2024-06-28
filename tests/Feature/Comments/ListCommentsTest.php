@@ -16,7 +16,8 @@ class ListCommentsTest extends TestCase
 
         $this->getJsonApi(route('api.v1.comments.show', $comment))
             ->assertOk()
-            ->assertJsonApiResource($comment, ['body']);
+            ->assertJsonApiResource($comment, ['body'])
+            ->assertJsonApiRelationshipLinks($comment, ['article', 'author']);
     }
 
     public function test_can_fetch_all_comments(): void
