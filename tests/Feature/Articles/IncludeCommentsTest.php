@@ -25,4 +25,17 @@ class IncludeCommentsTest extends TestCase
                 'included' => CommentResource::getCollectionResources($article->comments),
             ]);
     }
+
+    public function test_can_include_related_comments_of_multiple_articles()
+    {
+        $articles = Article::factory()->count(2)->hasComments(2)->create();
+        $this->getJsonApi(route('api.v1.articles.index', [
+            'include' => 'comments',
+        ]))
+            ->assertOk()
+            ->assertJsonCount(4, 'included')
+            ->assertJson([
+                'included' => CommentResource::getCollectionResources($articles->flatMap->comments),
+            ]);
+    }
 }
