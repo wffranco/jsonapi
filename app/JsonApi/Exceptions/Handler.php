@@ -3,6 +3,7 @@
 namespace App\JsonApi\Exceptions;
 
 use App\JsonApi\Exceptions as JsonApi;
+use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
@@ -13,34 +14,51 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler
 {
+    protected static ?Closure $shouldRender = null;
+
     public static function render(Exceptions $exceptions)
     {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
-            if ($request->isJsonApi()) {
+            if (static::shouldRenderJsonApi($request)) {
                 return (new JsonApi\AuthenticationException($e->getMessage(), $e->getCode(), $e))->render($request);
             }
         });
         $exceptions->render(function (BadRequestHttpException $e, Request $request) {
-            if ($request->isJsonApi()) {
+            if (static::shouldRenderJsonApi($request)) {
                 return (new JsonApi\BadRequestHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
             }
         });
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->isJsonApi()) {
+            if (static::shouldRenderJsonApi($request)) {
                 return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
             }
         });
         $exceptions->render(function (UnauthorizedException $e, Request $request) {
-            if ($request->isJsonApi()) {
+            if (static::shouldRenderJsonApi($request)) {
                 return (new JsonApi\UnauthorizedException($e->getMessage(), $e->getCode(), $e))->render($request);
             }
 
             return response()->json(['message' => 'Unauthorized.'], 401);
         });
         $exceptions->render(function (ValidationException $e, Request $request) {
-            if ($request->isJsonApi()) {
+            if (static::shouldRenderJsonApi($request)) {
                 return (new JsonApi\ValidationException($e->validator))->render($request);
             }
         });
+    }
+
+    /**
+     * @param  null|Closure(Request $request): bool  $callback
+     */
+    public static function shouldRenderJsonApiWhen(?Closure $callback)
+    {
+        static::$shouldRender = $callback;
+    }
+
+    public static function shouldRenderJsonApi(Request $request): bool
+    {
+        return static::$shouldRender
+            ? (static::$shouldRender)($request)
+            : $request->isJsonApi();
     }
 }

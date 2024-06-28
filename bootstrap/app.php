@@ -29,5 +29,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        Handler::shouldRenderJsonApiWhen(fn (Request $r) => $r->is('api/*') && $r->isJsonApi());
         Handler::render($exceptions);
     })->create();

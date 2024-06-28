@@ -34,6 +34,7 @@ namespace Illuminate\Http {
         /** @return mixed */ public function getAttributes($key = null, $default = null) { return static::$mixin->getAttributes()($key, $default); }
         /** @return null|string */ public function getRelationshipId(string $key, ?string $default = null) { return static::$mixin->getRelationshipId()($key, $default); }
         /** @return mixed */ public function getRelationships($key = null, $default = null) { return static::$mixin->getRelationships()($key, $default); }
+        /** @return bool */ public function hasJsonApiContent(?string $key = null) { return static::$mixin->hasJsonApiContent()($key); }
         /** @return bool */ public function hasRelationships(?string $key = null) { return static::$mixin->hasRelationships()($key); }
         /** @return bool */ public function isJsonApi() { return static::$mixin->isJsonApi()(); }
         /** @return mixed */ public function validatedData($key = null, $default = null) { return static::$mixin->validatedData()($key, $default); }

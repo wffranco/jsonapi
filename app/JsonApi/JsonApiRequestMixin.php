@@ -40,6 +40,13 @@ class JsonApiRequestMixin
         };
     }
 
+    public function hasJsonApiContent()
+    {
+        return function (?string $key = null): bool {
+            return $this->header('Content-Type') === 'application/vnd.api+json' && (! $key || $this->filled($key));
+        };
+    }
+
     public function hasRelationships()
     {
         return function (?string $key = null): bool {
