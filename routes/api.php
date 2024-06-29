@@ -9,19 +9,19 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentArticleController;
 use App\Http\Controllers\Api\CommentAuthorController;
 use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\LoginController;
-use App\Http\Controllers\Api\LogoutController;
-use App\Http\Controllers\Api\RegisterController;
-use App\Http\Middleware\ValidateJsonApiDocument;
-use App\Http\Middleware\ValidateJsonApiHeaders;
+use App\JsonApi\Http\Middleware\ValidateDocument;
+use App\JsonApi\Http\Middleware\ValidateHeaders;
+use App\JsonApi\Sanctum\Http\Controllers\Auth\LoginController;
+use App\JsonApi\Sanctum\Http\Controllers\Auth\LogoutController;
+use App\JsonApi\Sanctum\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
-Route::withoutMiddleware(ValidateJsonApiHeaders::class)
+Route::withoutMiddleware(ValidateHeaders::class)
     ->get('info', fn () => response()->json(['name' => 'Laravel JSON:API', 'version' => app()->version()]));
 
 Route::withoutMiddleware([
-    ValidateJsonApiDocument::class,
-    ValidateJsonApiHeaders::class,
+    ValidateDocument::class,
+    ValidateHeaders::class,
 ])->prefix('auth')->name('auth.')->group(function () {
     Route::post('login', LoginController::class)->name('login');
     Route::post('logout', LogoutController::class)->name('logout');

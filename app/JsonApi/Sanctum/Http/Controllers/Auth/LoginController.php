@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\JsonApi\Sanctum\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TokenResource;
+use App\JsonApi\Sanctum\Http\Resource\Json\TokenResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;

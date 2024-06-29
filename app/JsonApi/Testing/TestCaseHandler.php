@@ -1,18 +1,15 @@
 <?php
 
-namespace App\JsonApi\Tests;
+namespace App\JsonApi\Testing;
 
-use App\JsonApi\JsonApiDocument;
-use App\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use App\JsonApi\Http\Resources\Json\Document;
 use Illuminate\Testing\TestResponse;
-use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * @mixin \Tests\TestCase
  */
-trait JsonApiRequests
+trait TestCaseHandler
 {
     public function assertJsonApiPaginationLinks(TestResponse $response, int $number = 1, int $size = 15, array $queries = [], ?int $last = null, int $first = 1): static
     {
@@ -35,16 +32,6 @@ trait JsonApiRequests
         return $this;
     }
 
-    public function actingAs(?UserContract $user = null, $abilities = null): static
-    {
-        Sanctum::actingAs(
-            $user ?? User::factory()->createOne(),
-            $abilities ?? [],
-        );
-
-        return $this;
-    }
-
     public function json($method, $uri, array $data = [], array $headers = [], $options = 0)
     {
         /** @var TestResponse $response */
@@ -61,7 +48,7 @@ trait JsonApiRequests
         $headers['Accept'] = 'application/vnd.api+json';
         if (! isset($data['data'])) {
             $segments = explode('/', (string) \Str::of(parse_url($uri, PHP_URL_PATH))->afterNext('api/v1/'));
-            $document = JsonApiDocument::make()
+            $document = Document::make()
                 ->type($segments[0] ?? null)
                 ->id($segments[1] ?? null);
             if (isset($data['attributes'])) {

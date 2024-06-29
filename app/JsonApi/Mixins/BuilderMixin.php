@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Mixins;
 
 use App\JsonApi\Exceptions\HttpException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * @mixin Builder
  */
-class JsonApiEloquentBuilderMixin
+class BuilderMixin
 {
     public function allowedIncludes()
     {

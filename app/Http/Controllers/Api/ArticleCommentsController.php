@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
-use App\JsonApi\JsonApiAuthorize;
+use App\JsonApi\Sanctum\Contracts\Authorize;
 use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class ArticleCommentsController extends Controller implements HasMiddleware
 {
-    use JsonApiAuthorize;
+    use Authorize;
 
     public static function middleware(): array
     {

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Http\Resources\Json;
 
+use App\JsonApi\Support\DotCollection;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-class JsonApiDocument extends Dot\Collection
+class Document extends DotCollection
 {
     protected ?Collection $collection = null;
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\JsonApi\JsonApiResource;
+use App\JsonApi\Http\Resources\Json\JsonApiResource;
 use App\Models\User;
 
 /**

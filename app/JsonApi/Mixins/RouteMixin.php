@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Mixins;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 /**
  * @mixin Request
  */
-class JsonApiRouteMixin
+class RouteMixin
 {
     public function apiRelationshipResource()
     {

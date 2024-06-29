@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Articles;
 
-use App\JsonApi\JsonApiDocument;
+use App\JsonApi\Http\Resources\Json\Document;
 use App\Models\Article;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,7 +27,7 @@ class IncludeCategoriesTest extends TestCase
             ->assertJson([
                 'data' => [],
                 'included' => [
-                    JsonApiDocument::make($article->category)->attributes()->get('data'),
+                    Document::make($article->category)->attributes()->get('data'),
                 ],
             ]);
     }
@@ -44,7 +44,7 @@ class IncludeCategoriesTest extends TestCase
             ->assertJson([
                 'data' => [],
                 'included' => $articles->map(
-                    fn (Article $article) => JsonApiDocument::make($article->category)->attributes()->get('data')
+                    fn (Article $article) => Document::make($article->category)->attributes()->get('data')
                 )->all(),
             ]);
     }

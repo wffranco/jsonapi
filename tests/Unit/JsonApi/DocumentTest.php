@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\JsonApi;
 
-use App\JsonApi\JsonApiDocument;
+use App\JsonApi\Http\Resources\Json\Document;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -14,7 +14,7 @@ class DocumentTest extends TestCase
 {
     public function test_can_create_a_document_from_data(): void
     {
-        $document = JsonApiDocument::make()
+        $document = Document::make()
             ->type('users')
             ->id('1')
             ->attributes([
@@ -74,7 +74,7 @@ class DocumentTest extends TestCase
             ]);
         });
 
-        $document = JsonApiDocument::make($user)
+        $document = Document::make($user)
             ->attributes()
             ->relationshipData([
                 'role' => $role,
@@ -104,8 +104,8 @@ class DocumentTest extends TestCase
 
     public function test_can_create_a_document_list_from_data(): void
     {
-        $document = JsonApiDocument::make()->put('data', [
-            JsonApiDocument::make()
+        $document = Document::make()->put('data', [
+            Document::make()
                 ->type('users')
                 ->id('1')
                 ->attributes([
@@ -121,7 +121,7 @@ class DocumentTest extends TestCase
                     ],
                 ])
                 ->get('data'),
-            JsonApiDocument::make()
+            Document::make()
                 ->type('users')
                 ->id('2')
                 ->attributes([
@@ -201,7 +201,7 @@ class DocumentTest extends TestCase
         });
         $users = collect([$user]);
 
-        $document = JsonApiDocument::make(
+        $document = Document::make(
             $users,
             fn ($item) => $item->attributes()->relationshipData()
         )->all();

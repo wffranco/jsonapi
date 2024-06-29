@@ -2,6 +2,10 @@
 
 namespace App\JsonApi;
 
+use App\JsonApi\Mixins\BuilderMixin;
+use App\JsonApi\Mixins\RequestMixin;
+use App\JsonApi\Mixins\RouteMixin;
+use App\JsonApi\Mixins\TestResponseMixin;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,9 +27,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
-        Builder::mixin(new JsonApiEloquentBuilderMixin());
-        TestResponse::mixin(new JsonApiTestResponseMixin());
-        Request::mixin(new JsonApiRequestMixin());
-        Route::mixin(new JsonApiRouteMixin());
+        Builder::mixin(new BuilderMixin());
+        TestResponse::mixin(new TestResponseMixin());
+        Request::mixin(new RequestMixin());
+        Route::mixin(new RouteMixin());
     }
 }

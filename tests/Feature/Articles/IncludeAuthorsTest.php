@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Articles;
 
-use App\JsonApi\JsonApiDocument;
+use App\JsonApi\Http\Resources\Json\Document;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,7 +28,7 @@ class IncludeAuthorsTest extends TestCase
             ->assertJson([
                 'data' => [],
                 'included' => [
-                    JsonApiDocument::make($article->author)->attributes()->get('data'),
+                    Document::make($article->author)->attributes()->get('data'),
                 ],
             ]);
     }
@@ -45,7 +45,7 @@ class IncludeAuthorsTest extends TestCase
             ->assertJson([
                 'data' => [],
                 'included' => User::all()
-                    ->map(fn (User $author) => JsonApiDocument::make($author)->attributes()->get('data'))
+                    ->map(fn (User $author) => Document::make($author)->attributes()->get('data'))
                     ->all(),
             ]);
     }

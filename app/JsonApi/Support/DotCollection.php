@@ -1,13 +1,13 @@
 <?php
 
-namespace App\JsonApi\Dot;
+namespace App\JsonApi\Support;
 
 use Illuminate\Support\Arr;
 
 /**
  * A collection that allows you to handle values using dot notation.
  */
-class Collection extends \Illuminate\Support\Collection
+class DotCollection extends \Illuminate\Support\Collection
 {
     public function get($key, $default = null)
     {

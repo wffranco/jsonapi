@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Http\Resources\Json;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -120,7 +120,7 @@ abstract class JsonApiResource extends JsonResource
     public function toArray(Request $request): array
     {
         if ($this->identifier) {
-            return JsonApiDocument::make($this->resource)->get('data');
+            return Document::make($this->resource)->get('data');
         }
         if (request()->filled('include')) {
             foreach ($this->getIncludes() as $include) {
@@ -132,7 +132,7 @@ abstract class JsonApiResource extends JsonResource
             }
         }
 
-        return JsonApiDocument::make($this->resource)
+        return Document::make($this->resource)
             ->attributes($this->filteredAttributes())
             ->links()
             ->relationshipData($this->getRelationshipKeys())

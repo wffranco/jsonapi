@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\JsonApi\Sanctum\Http\Resource\Json;
 
 use App\Models\User;
 use Illuminate\Http\Request;

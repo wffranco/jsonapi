@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthorResource;
-use App\JsonApi\JsonApiAuthorize;
-use App\JsonApi\JsonApiResource;
+use App\JsonApi\Http\Resources\Json\JsonApiResource;
+use App\JsonApi\Sanctum\Contracts\Authorize;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class ArticleAuthorController extends Controller implements HasMiddleware
 {
-    use JsonApiAuthorize;
+    use Authorize;
 
     public static function middleware(): array
     {

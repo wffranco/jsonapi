@@ -1,11 +1,11 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Sanctum\Contracts;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
-trait JsonApiAuthorize
+trait Authorize
 {
     public function authorize(string $ability, $arguments = []): void
     {

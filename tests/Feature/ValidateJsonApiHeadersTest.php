@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\ValidateJsonApiHeaders;
+use App\JsonApi\Http\Middleware\ValidateHeaders;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -14,7 +14,7 @@ class ValidateJsonApiHeadersTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Route::prefix('/test/api')->middleware(ValidateJsonApiHeaders::class)->group(function () {
+        Route::prefix('/test/api')->middleware(ValidateHeaders::class)->group(function () {
             Route::any('headers', fn () => 'OK');
             Route::any('empty', fn () => response()->noContent());
         });

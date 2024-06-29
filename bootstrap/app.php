@@ -21,8 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(append: [
-            \App\Http\Middleware\ValidateJsonApiHeaders::class,
-            \App\Http\Middleware\ValidateJsonApiDocument::class,
+            \App\JsonApi\Http\Middleware\ValidateDocument::class,
+            \App\JsonApi\Http\Middleware\ValidateHeaders::class,
         ]);
         $middleware->redirectUsersTo(function (Request $request) {
             throw_if($request->is('api/v1/*') || $request->expectsJson(), UnauthorizedException::class);

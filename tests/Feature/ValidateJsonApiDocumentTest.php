@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\ValidateJsonApiDocument;
+use App\JsonApi\Http\Middleware\ValidateDocument;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -14,7 +14,7 @@ class ValidateJsonApiDocumentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Route::any('/test/api/request', fn () => 'OK')->middleware(ValidateJsonApiDocument::class);
+        Route::any('/test/api/request', fn () => 'OK')->middleware(ValidateDocument::class);
     }
 
     public function test_all_required_fields_are_validated(): void

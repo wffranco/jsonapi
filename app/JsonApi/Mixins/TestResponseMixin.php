@@ -1,14 +1,15 @@
 <?php
 
-namespace App\JsonApi;
+namespace App\JsonApi\Mixins;
 
+use App\JsonApi\Http\Resources\Json\Document;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class JsonApiTestResponseMixin
+class TestResponseMixin
 {
     public function assertJsonApiCollection()
     {
@@ -17,7 +18,7 @@ class JsonApiTestResponseMixin
             return $this->assertJsonApiCollectionStructure($attributeKeys)
                 ->assertJson([
                     'data' => $collection->map(
-                        fn (Model $model) => JsonApiDocument::make($model)
+                        fn (Model $model) => Document::make($model)
                             ->attributes($attributeKeys)
                             ->links()
                             ->get('data')
@@ -115,7 +116,7 @@ class JsonApiTestResponseMixin
             /** @var TestResponse $this */
             return $this->assertJsonApiResourceStructure($attributeKeys)
                 ->assertJson([
-                    'data' => JsonApiDocument::make($model)->attributes($attributeKeys)->links()->get('data'),
+                    'data' => Document::make($model)->attributes($attributeKeys)->links()->get('data'),
                 ])
                 ->when(! empty($missingKeys), fn (TestResponse $response) => $response->assertJsonApiMissingAttributes($model, $missingKeys));
         };
