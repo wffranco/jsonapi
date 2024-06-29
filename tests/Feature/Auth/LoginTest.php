@@ -29,7 +29,7 @@ class LoginTest extends TestCase
         $user = User::factory()->create();
         $this->logged($user)->login(user: $user)
             ->assertUnauthorized()
-            ->assertJson(['message' => 'Unauthorized.']);
+            ->assertJson(['message' => 'You are not authorized to access this resource.']);
 
         $this->assertCount(1, $user->fresh()->tokens);
     }

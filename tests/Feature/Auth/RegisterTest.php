@@ -124,7 +124,7 @@ class RegisterTest extends TestCase
         $user = User::factory()->create();
         $this->logged($user)->register()
             ->assertUnauthorized()
-            ->assertJson(['message' => 'Unauthorized.']);
+            ->assertJson(['message' => 'You are not authorized to access this resource.']);
 
         $this->assertDatabaseCount('users', 1);
     }

@@ -2,7 +2,7 @@
 
 namespace App\JsonApi;
 
-use App\JsonApi\Exceptions\BadRequestHttpException;
+use App\JsonApi\Exceptions\HttpException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -19,7 +19,7 @@ class JsonApiEloquentBuilderMixin
             return $this->when(request()->filled('include'), function (Builder $query) use ($allowed) {
                 $includes = explode(',', request('include'));
                 $notAllowed = collect($includes)->diff($allowed);
-                BadRequestHttpException::throwIf(! $notAllowed->isEmpty(), "Includes not allowed in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
+                HttpException::throwIf(! $notAllowed->isEmpty(), 400, "Includes not allowed in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
 
                 return $query->with($includes);
             });
@@ -31,7 +31,7 @@ class JsonApiEloquentBuilderMixin
         return function (array $allowed = []): Builder {
             return $this->when(request()->filled('filter'), function (Builder $query) use ($allowed) {
                 foreach (request('filter') as $field => $value) {
-                    BadRequestHttpException::throwIf(! in_array($field, $allowed), "Filter not allowed in '{$query->getResourceType()}' resource: {$field}.");
+                    HttpException::throwIf(! in_array($field, $allowed), 400, "Filter not allowed in '{$query->getResourceType()}' resource: {$field}.");
                     $query->hasNamedScope($field)
                         ? $query->{$field}($value)
                         : $query->where($field, 'like', '%'.$value.'%');
@@ -71,7 +71,7 @@ class JsonApiEloquentBuilderMixin
             return $this->when(request()->filled('sort'), function (Builder $query) use ($allowed) {
                 $sortFields = explode(',', request('sort'));
                 $notAllowed = collect($sortFields)->map(fn ($sort) => ltrim($sort, '-'))->diff($allowed);
-                BadRequestHttpException::throwIf(! $notAllowed->isEmpty(), "Invalid sort fields in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
+                HttpException::throwIf(! $notAllowed->isEmpty(), 400, "Invalid sort fields in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
                 foreach ($sortFields as $sort) {
                     $field = ltrim($sort, '-');
                     $direction = $sort[0] === '-' ? 'desc' : 'asc';
@@ -97,7 +97,7 @@ class JsonApiEloquentBuilderMixin
                 }
 
                 $notAllowed = collect($fields)->diff($allowed)->map(fn ($field) => "fields.{$type}.{$field}");
-                BadRequestHttpException::throwIf(! $notAllowed->isEmpty(), "Invalid fields requested in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
+                HttpException::throwIf(! $notAllowed->isEmpty(), 400, "Invalid fields requested in '{$query->getResourceType()}' resource: {$notAllowed->implode(', ')}.");
 
                 $query->addSelect($fields);
             });

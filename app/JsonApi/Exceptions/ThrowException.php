@@ -2,22 +2,25 @@
 
 namespace App\JsonApi\Exceptions;
 
+use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 /**
- * @mixin \Exception
+ * @mixin HttpException
  */
 trait ThrowException
 {
-    public static function throwIf(bool $condition, string $message = '', int $code = 0): void
+    public static function throwIf(bool $condition, int|HttpExceptionInterface|RuntimeException $code = 0, string $message = '', string $title = ''): void
     {
         if ($condition) {
-            throw new static($message, $code);
+            throw new static($code, $message, $title);
         }
     }
 
-    public static function throwUnless(bool $condition, string $message = '', int $code = 0): void
+    public static function throwUnless(bool $condition, int|HttpExceptionInterface|RuntimeException $code = 0, string $message = '', string $title = ''): void
     {
         if (! $condition) {
-            throw new static($message, $code);
+            throw new static($code, $message, $title);
         }
     }
 }

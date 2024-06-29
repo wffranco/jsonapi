@@ -7,17 +7,29 @@ use Illuminate\Validation\ValidationException as Exception;
 
 class ValidationException extends Exception
 {
-    public static function throwIf($condition, ?array $messages = null)
+    /**
+     * @param  bool  $condition
+     * @param  null|array|Exception  $messages
+     */
+    public static function throwIf($condition, $messages = null)
     {
         if ($condition) {
-            throw parent::withMessages($messages);
+            $messages instanceof Exception
+                ? throw new ValidationException($messages->validator, $messages->response, $messages->errorBag)
+                : throw static::withMessages($messages ?? []);
         }
     }
 
-    public static function throwUnless($condition, ?array $messages = null)
+    /**
+     * @param  bool  $condition
+     * @param  null|array|Exception  $messages
+     */
+    public static function throwUnless($condition, $messages = null)
     {
         if (! $condition) {
-            throw parent::withMessages($messages);
+            $messages instanceof Exception
+                ? throw new ValidationException($messages->validator, $messages->response, $messages->errorBag)
+                : throw static::withMessages($messages ?? []);
         }
     }
 

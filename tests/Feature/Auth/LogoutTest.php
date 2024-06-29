@@ -25,6 +25,6 @@ class LogoutTest extends TestCase
     {
         $this->logout()
             ->assertUnauthorized()
-            ->assertJson(['message' => 'Unauthenticated.']);
+            ->assertJson(['message' => 'This action requires authentication.']);
     }
 }

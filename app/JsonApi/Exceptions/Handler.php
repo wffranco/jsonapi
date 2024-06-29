@@ -9,8 +9,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler
 {
@@ -19,31 +18,16 @@ class Handler
     public static function render(Exceptions $exceptions)
     {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
-            if (static::shouldRenderJsonApi($request)) {
-                return (new JsonApi\AuthenticationException($e->getMessage(), $e->getCode(), $e))->render($request);
-            }
-        });
-        $exceptions->render(function (BadRequestHttpException $e, Request $request) {
-            if (static::shouldRenderJsonApi($request)) {
-                return (new JsonApi\BadRequestHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
-            }
-        });
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if (static::shouldRenderJsonApi($request)) {
-                return (new JsonApi\NotFoundHttpException($e->getMessage(), $e->getCode(), $e))->render($request);
-            }
-        });
-        $exceptions->render(function (UnauthorizedException $e, Request $request) {
-            if (static::shouldRenderJsonApi($request)) {
-                return (new JsonApi\UnauthorizedException($e->getMessage(), $e->getCode(), $e))->render($request);
-            }
-
-            return response()->json(['message' => 'Unauthorized.'], 401);
-        });
-        $exceptions->render(function (ValidationException $e, Request $request) {
-            if (static::shouldRenderJsonApi($request)) {
-                return (new JsonApi\ValidationException($e->validator))->render($request);
-            }
+            JsonApi\HttpException::throwIf(static::shouldRenderJsonApi($request), 401,
+                'This action requires authentication.', 'Unauthenticated');
+            throw new HttpException(401, 'This action requires authentication.');
+        })->render(function (HttpException $e, Request $request) {
+            JsonApi\HttpException::throwIf(static::shouldRenderJsonApi($request), $e);
+        })->render(function (UnauthorizedException $e, Request $request) {
+            JsonApi\HttpException::throwIf(static::shouldRenderJsonApi($request), $e);
+            throw new HttpException(401, 'You are not authorized to access this resource.');
+        })->render(function (ValidationException $e, Request $request) {
+            JsonApi\ValidationException::throwIf(static::shouldRenderJsonApi($request), $e);
         });
     }
 
