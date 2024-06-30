@@ -38,8 +38,7 @@ class UpdateArticlesTest extends TestCase
                 'slug' => 'slug',
             ])
             ->assertOk()
-            ->assertJsonApiHeaderLocation($article->refresh())
-            ->assertJsonApiResource($article, ['title', 'content', 'slug']);
+            ->assertJsonApiResource($article->refresh(), ['title', 'content', 'slug']);
     }
 
     public function test_cannot_update_other_users_articles(): void
@@ -117,9 +116,9 @@ class UpdateArticlesTest extends TestCase
                     'category' => $category,
                 ],
             ])
-            ->assertOk()
-            ->assertJsonApiHeaderLocation($article->refresh());
+            ->assertOk();
 
+        $article->refresh();
         $this->assertTrue($author->is($article->author));
         $this->assertTrue($category->is($article->category));
     }

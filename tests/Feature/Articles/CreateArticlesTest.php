@@ -43,8 +43,7 @@ class CreateArticlesTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonApiHeaderLocation($article = Article::first())
-            ->assertJsonApiResource($article, ['title', 'content', 'slug']);
+            ->assertJsonApiResource($article = Article::first(), ['title', 'content', 'slug']);
 
         $this->assertDatabaseHas('articles', [
             'id' => $article->id,

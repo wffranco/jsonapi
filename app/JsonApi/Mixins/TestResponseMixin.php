@@ -118,7 +118,11 @@ class TestResponseMixin
                 ->assertJson([
                     'data' => Document::make($model)->attributes($attributeKeys)->links()->get('data'),
                 ])
-                ->when(! empty($missingKeys), fn (TestResponse $response) => $response->assertJsonApiMissingAttributes($model, $missingKeys));
+                ->when(! empty($missingKeys), fn (TestResponse $response) => $response->assertJsonApiMissingAttributes($model, $missingKeys))
+                ->when($this->status() === 201,
+                    fn (TestResponse $response) => $response->assertJsonApiHeaderLocation($model),
+                    fn (TestResponse $response) => $response->assertMissingJsonApiHeaderLocation($model),
+                );
         };
     }
 
@@ -198,6 +202,20 @@ class TestResponseMixin
             $this->assertJsonApiHeaderContentType();
 
             return $this->assertStatus(422);
+        };
+    }
+
+    public function assertMissingJsonApiHeaderLocation()
+    {
+        return function (Model $model): TestResponse {
+            /** @var TestResponse $this */
+            try {
+                $this->assertHeaderMissing('Location', route('api.v1.'.$model->getResourceType().'.show', $model));
+            } catch (ExpectationFailedException $e) {
+                PHPUnit::fail('Failed to find a missing JSON:API header "Location"'.PHP_EOL.PHP_EOL.$e->getMessage());
+            }
+
+            return $this;
         };
     }
 }

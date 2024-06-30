@@ -94,5 +94,8 @@ namespace Illuminate\Testing {
         /** @return static */
         public function assertJsonApiValidationErrors(string $attribute, bool $raw = false)
         { return static::$mixin->assertJsonApiValidationErrors()($attribute, $raw); }
+        /** @return static */
+        public function assertMissingJsonApiHeaderLocation()
+        { return static::$mixin->assertMissingJsonApiHeaderLocation()(); }
     }
 }

@@ -23,6 +23,7 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'data.type' => ['required', 'in:comments'],
             'data.attributes.body' => ['required'],
             'data.relationships.article.data.id' => [
                 Rule::requiredIf(! $this->route('comment')),

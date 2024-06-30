@@ -31,8 +31,7 @@ class UpdateCommentsTest extends TestCase
                 'body' => $body = 'Body',
             ])
             ->assertOk()
-            ->assertJsonApiHeaderLocation($comment->refresh())
-            ->assertJsonApiResource($comment, ['body']);
+            ->assertJsonApiResource($comment->refresh(), ['body']);
 
         $this->assertEquals($comment->body, $body);
     }
@@ -76,8 +75,7 @@ class UpdateCommentsTest extends TestCase
                 ],
             ])
             ->assertOk()
-            ->assertJsonApiHeaderLocation($comment->refresh())
-            ->assertJsonApiResource($comment, ['body']);
+            ->assertJsonApiResource($comment->refresh(), ['body']);
 
         $this->assertTrue($article->is($comment->article));
     }

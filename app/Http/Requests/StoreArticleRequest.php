@@ -24,8 +24,13 @@ class StoreArticleRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'data.type' => ['required', 'in:articles'],
+            'data.id' => [
+                Rule::requiredIf($this->route('article')),
+                Rule::exists('articles', 'slug'),
+            ],
             'data.attributes.title' => ['required'],
-            'data.attributes.content' => ['required'],
+            'data.attributes.content' => ['required', 'string'],
             'data.attributes.slug' => [
                 'required',
                 new Slug,

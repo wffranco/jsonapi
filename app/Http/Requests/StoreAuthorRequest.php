@@ -22,6 +22,11 @@ class StoreAuthorRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'data.type' => ['required', 'in:authors'],
+            'data.attributes.alias' => ['required', 'string', 'unique:users,alias'],
+            'data.attributes.name' => ['required', 'string'],
+            'data.attributes.email' => ['required', 'email', 'unique:users,email'],
+            'data.attributes.password' => ['required', 'string', 'min:8'],
         ];
     }
 

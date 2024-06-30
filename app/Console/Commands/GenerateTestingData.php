@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Comment;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
@@ -43,6 +44,7 @@ class GenerateTestingData extends Command
             'alias' => 'johndoe',
             'email' => 'user@email.com',
         ]);
+        $this->setPermissions($user);
 
         $article = Article::factory()->hasComments(5)->create([
             'user_id' => $user->id,
@@ -53,6 +55,7 @@ class GenerateTestingData extends Command
         $this->titled('User UUID', $user->id);
         $this->titled('User Name', $user->name);
         $this->titled('User email', $user->email);
+        $this->titled('User Permissions', $user->permissions->pluck('name')->join(','));
 
         $this->line('');
 
@@ -60,6 +63,24 @@ class GenerateTestingData extends Command
         $this->titled('Article ID', $article->slug);
         $this->titled('Category ID', $article->category->slug);
         $this->titled('Comment IDs', $article->comments->pluck('id')->join(','));
+    }
+
+    protected function setPermissions(User $user)
+    {
+        $permissions = collect([
+            'article:create',
+            'article:update',
+            'article:delete',
+            'category:create',
+            'category:update',
+            'category:delete',
+            'comment:create',
+            'comment:update',
+            'comment:delete',
+        ]);
+        $user->permissions()->createMany(
+            $permissions->map(fn ($permission) => ['name' => $permission])->toArray()
+        );
     }
 
     protected function truncateTables()
@@ -73,6 +94,7 @@ class GenerateTestingData extends Command
         Comment::truncate();
         Article::truncate();
 
+        Permission::truncate();
         Category::truncate();
         User::truncate();
 

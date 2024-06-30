@@ -41,8 +41,7 @@ class CreateCommentsTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonApiHeaderLocation($comment = Comment::first())
-            ->assertJsonApiResource($comment, ['body']);
+            ->assertJsonApiResource($comment = Comment::first(), ['body']);
 
         $this->assertDatabaseHas('comments', [
             'body' => $comment->body,

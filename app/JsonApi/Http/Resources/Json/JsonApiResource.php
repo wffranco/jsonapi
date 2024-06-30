@@ -142,9 +142,11 @@ abstract class JsonApiResource extends JsonResource
 
     public function withResponse(Request $request, JsonResponse $response)
     {
-        $response->withHeaders([
-            'Location' => route('api.v1.'.$this->resource->getResourceType().'.show', $this->resource),
-        ]);
+        if ($response->status() === 201) {
+            $response->withHeaders([
+                'Location' => route('api.v1.'.$this->resource->getResourceType().'.show', $this->resource),
+            ]);
+        }
     }
 
     protected function filteredAttributes(): array
