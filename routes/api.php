@@ -4,6 +4,9 @@ use App\Http\Controllers\Api\ArticleAuthorController;
 use App\Http\Controllers\Api\ArticleCategoryController;
 use App\Http\Controllers\Api\ArticleCommentsController;
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\LogoutController;
+use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentArticleController;
@@ -11,9 +14,6 @@ use App\Http\Controllers\Api\CommentAuthorController;
 use App\Http\Controllers\Api\CommentController;
 use App\JsonApi\Http\Middleware\ValidateDocument;
 use App\JsonApi\Http\Middleware\ValidateHeaders;
-use App\JsonApi\Sanctum\Http\Controllers\Auth\LoginController;
-use App\JsonApi\Sanctum\Http\Controllers\Auth\LogoutController;
-use App\JsonApi\Sanctum\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 Route::withoutMiddleware(ValidateHeaders::class)

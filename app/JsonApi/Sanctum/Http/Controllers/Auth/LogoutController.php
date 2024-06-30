@@ -4,10 +4,11 @@ namespace App\JsonApi\Sanctum\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class LogoutController extends Controller implements HasMiddleware
+abstract class LogoutController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
@@ -16,7 +17,7 @@ class LogoutController extends Controller implements HasMiddleware
         ];
     }
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): Response
     {
         $request->user()->currentAccessToken()->delete();
 

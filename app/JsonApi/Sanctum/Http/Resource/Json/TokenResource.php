@@ -2,12 +2,12 @@
 
 namespace App\JsonApi\Sanctum\Http\Resource\Json;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Laravel\Sanctum\NewAccessToken;
 
 /**
- * @property User $resource
+ * @property NewAccessToken $resource
  */
 class TokenResource extends JsonResource
 {
@@ -15,13 +15,8 @@ class TokenResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $token = $this->resource->createToken(
-            $request->device_name,
-            $this->resource->permissions->pluck('name')->toArray(),
-        );
-
         return [
-            'token' => $token?->plainTextToken,
+            'token' => $this->resource->plainTextToken,
         ];
     }
 }

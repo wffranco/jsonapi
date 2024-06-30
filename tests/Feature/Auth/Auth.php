@@ -4,7 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 
-/** @mixin \Tests\TestCase */
+/** @mixin \Illuminate\Foundation\Testing\TestCase */
 trait Auth
 {
     protected function logged(?User $user = null, ?string $token = null)

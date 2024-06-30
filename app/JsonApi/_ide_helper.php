@@ -8,7 +8,7 @@ namespace Illuminate\Database\Eloquent {
     use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
     class Builder extends \Illuminate\Database\Eloquent\Builder {
-        private static \App\JsonApi\JsonApiEloquentBuilderMixin $mixin;
+        private static \App\JsonApi\Mixins\BuilderMixin $mixin;
         /** @return static */ public function allowedIncludes(array $allowed = []) { return static::$mixin->allowedIncludes()($allowed); }
         /** @return static */ public function filterableBy(array $allowed = []) { return static::$mixin->filterableBy()($allowed); }
         /** @return string */ public function getResourceType() { return static::$mixin->getResourceType()(); }
@@ -30,7 +30,7 @@ namespace Illuminate\Database\Eloquent {
 
 namespace Illuminate\Http {
     class Request extends \Illuminate\Http\Request {
-        private static \App\JsonApi\JsonApiRequestMixin $mixin;
+        private static \App\JsonApi\Mixins\RequestMixin $mixin;
         /** @return mixed */ public function getAttributes($key = null, $default = null) { return static::$mixin->getAttributes()($key, $default); }
         /** @return null|string */ public function getRelationshipId(string $key, ?string $default = null) { return static::$mixin->getRelationshipId()($key, $default); }
         /** @return mixed */ public function getRelationships($key = null, $default = null) { return static::$mixin->getRelationships()($key, $default); }
@@ -45,7 +45,7 @@ namespace Illuminate\Routing {
     use Closure;
 
     class Route extends \Illuminate\Routing\Route {
-        private static \App\JsonApi\JsonApiRouteMixin $mixin;
+        private static \App\JsonApi\Mixins\RouteMixin $mixin;
         /** @return void */
         public static function apiRelationshipResource(string $uri, Closure|string $controller, array $only = ['index', 'show', 'update'], array $except = [])
         { return static::$mixin->apiRelationshipResource()($uri, $controller, $only, $except); }
@@ -63,7 +63,7 @@ namespace Illuminate\Testing {
     use Illuminate\Database\Eloquent\Model;
 
     class TestResponse extends \Illuminate\Testing\TestResponse {
-        private static \App\JsonApi\JsonApiTestResponseMixin $mixin;
+        private static \App\JsonApi\Mixins\TestResponseMixin $mixin;
         /** @return static */
         public function assertJsonApiCollection(Collection $collection, array $attributeKeys, array $missingKeys = [])
         { return static::$mixin->assertJsonApiCollection()($collection, $attributeKeys, $missingKeys); }
