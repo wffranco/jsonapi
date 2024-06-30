@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -24,6 +25,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string|null $remember_token
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read Collection<Article> $articles
+ * @property-read int|null $articles_count
  * @property-read DatabaseNotificationCollection<DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<PersonalAccessToken> $tokens
@@ -86,6 +89,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany(Article::class);
     }
 
     public function permissions()
