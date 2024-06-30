@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read User $author
  * @property-read Category $category
  * @property-read Collection<Comment> $comments
+ * @property-read int|null $comments_count
  *
  * @method static ArticleFactory<static> factory($count = null, $state = [])
  * @method static static newModelQuery()
