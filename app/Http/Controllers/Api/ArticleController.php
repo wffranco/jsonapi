@@ -31,7 +31,7 @@ class ArticleController extends Controller implements HasMiddleware
         $articles = Article::query()
             ->allowedIncludes(['author', 'category', 'comments'])
             ->sparseFields(['title', 'content', 'slug'])
-            ->filterableBy(['title', 'content', 'year', 'month', 'day', 'category'])
+            ->filterableBy(['title', 'content', 'year', 'month', 'day', 'author', 'category'])
             ->sortableBy(['title', 'content'])
             ->paginated(['sort', 'filter']);
 

@@ -31,6 +31,8 @@ class ArticleFactory extends Factory
             'title' => $this->faker->sentence(4),
             'content' => $this->faker->paragraphs(3, true),
             'slug' => $this->faker->slug(),
+            'created_at' => $this->faker->dateTimeBetween('-3 year', '-3 day'),
+            'updated_at' => fn ($attributes) => $this->faker->dateTimeBetween($attributes['created_at'], 'now'),
         ];
     }
 }

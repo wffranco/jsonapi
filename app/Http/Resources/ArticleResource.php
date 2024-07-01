@@ -12,7 +12,7 @@ class ArticleResource extends JsonApiResource
 {
     public function allowedAttributes(): array
     {
-        return ['title', 'content', 'slug'];
+        return ['title', 'content', 'slug', 'created_at', 'updated_at'];
     }
 
     public function getIncludes(): array

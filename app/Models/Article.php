@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static static whereUserId($value)
  *
  * Scopes:
+ * @method static Builder|self author(string $authors) Author filter
  * @method static Builder|self category(string $categories) Category filter
  * @method static Builder|self day($day)
  * @method static Builder|self month($month)
@@ -60,6 +61,8 @@ class Article extends Model
         'title',
         'content',
         'slug',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -77,6 +80,7 @@ class Article extends Model
         return 'slug';
     }
 
+    /** Author relationship */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -91,6 +95,13 @@ class Article extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function scopeAuthor(Builder $query, string $authors)
+    {
+        return $query->whereHas('author',
+            fn (Builder $query) => $query->whereIn('alias', explode(',', $authors)),
+        );
     }
 
     public function scopeCategory(Builder|self $query, string $categories)

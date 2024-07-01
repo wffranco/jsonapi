@@ -52,8 +52,8 @@ class FilterArticlesTest extends TestCase
 
     public function test_can_filter_articles_by_month()
     {
-        Article::factory()->count(2)->create(['created_at' => now()->month(5)]);
-        $article = Article::factory()->create(['created_at' => now()->month(10)]);
+        Article::factory()->count(2)->create(['created_at' => now()->subYear()->month(5)]);
+        $article = Article::factory()->create(['created_at' => now()->subYear()->month(10)]);
 
         $this->getJsonApi(route('api.v1.articles.index', [
             'filter' => ['month' => 10],
@@ -64,8 +64,8 @@ class FilterArticlesTest extends TestCase
 
     public function test_can_filter_articles_by_day()
     {
-        Article::factory()->count(2)->create(['created_at' => now()->day(10)]);
-        $article = Article::factory()->create(['created_at' => now()->day(20)]);
+        Article::factory()->count(2)->create(['created_at' => now()->subMonth()->day(10)]);
+        $article = Article::factory()->create(['created_at' => now()->subMonth()->day(20)]);
 
         $this->getJsonApi(route('api.v1.articles.index', [
             'filter' => ['day' => 20],
