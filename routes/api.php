@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Auth\UserController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentArticleController;
@@ -26,6 +27,7 @@ Route::withoutMiddleware([
     Route::post('login', LoginController::class)->name('login');
     Route::post('logout', LogoutController::class)->name('logout');
     Route::post('register', RegisterController::class)->name('register');
+    Route::get('user', UserController::class)->name('user');
 });
 
 Route::apiResource('authors', AuthorController::class)
