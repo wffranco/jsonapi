@@ -32,7 +32,7 @@ class ArticleController extends Controller implements HasMiddleware
             ->allowedIncludes(['author', 'category', 'comments'])
             ->sparseFields(['title', 'content', 'slug'])
             ->filterableBy(['title', 'content', 'year', 'month', 'day', 'author', 'category'])
-            ->sortableBy(['title', 'content'])
+            ->sortableBy(['title', 'content', 'created_at'])
             ->paginated(['sort', 'filter']);
 
         return ArticleResource::collection($articles);
