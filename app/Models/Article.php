@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Scopes:
  * @method static Builder|self author(string $authors) Author filter
  * @method static Builder|self category(string $categories) Category filter
+ * @method static Builder|self comments(string $comments) Comments filter
  * @method static Builder|self day($day)
  * @method static Builder|self month($month)
  * @method static Builder|self year($year)
@@ -92,6 +93,7 @@ class Article extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /** Comments relationship */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -108,6 +110,13 @@ class Article extends Model
     {
         return $query->whereHas('category',
             fn (Builder|Category $query) => $query->whereIn('slug', explode(',', $categories)),
+        );
+    }
+
+    public function scopeComments(Builder|self $query, $comments)
+    {
+        return $query->whereHas('comments',
+            fn (Builder|self $query) => $query->whereIn('id', explode(',', $comments)),
         );
     }
 

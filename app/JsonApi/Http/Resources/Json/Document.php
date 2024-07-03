@@ -68,7 +68,17 @@ class Document extends DotCollection
             throw new \InvalidArgumentException('Invalid attributes format');
         }
 
-        return $this->put('data.attributes', $filter ? array_filter($attributes) : $attributes);
+        $attributes = $filter ? array_filter($attributes) : $attributes;
+        // if we have date instances, format them
+        foreach ($attributes as $key => $value) {
+            if ($value instanceof \Carbon\Carbon) {
+                $attributes[$key] = $value->toIso8601String();
+            } elseif (is_object($value) && method_exists($value, 'toArray')) {
+                $attributes[$key] = $value->toArray();
+            }
+        }
+
+        return $this->put('data.attributes', $attributes);
     }
 
     public function links(?array $links = null, string $prefix = 'data'): static
@@ -89,11 +99,21 @@ class Document extends DotCollection
         if (is_null($relationships)) {
             $relationships = $this?->model?->getRelations() ?? [];
         }
+        if (array_is_list($relationships)) {
+            if ($this->model) {
+                $relationships = array_combine(
+                    $relationships,
+                    array_map(fn ($relation) => $this->model->$relation, $relationships),
+                );
+            } else {
+                $relationships = [];
+            }
+        }
         foreach (Arr::undot($relationships) as $type => $relationship) {
-            $this->put("data.relationships.$type", match (true) {
-                $relationship instanceof Collection => $relationship->map(fn ($model) => static::make($model, $onModel))->all(),
-                $relationship instanceof Model => static::make($relationship, $onModel)->all(),
-                default => $relationship,
+            $this->put("data.relationships.$type.data", match (true) {
+                $relationship instanceof Collection => $relationship->map(fn ($model) => static::make($model, $onModel)->get('data'))->all(),
+                $relationship instanceof Model => static::make($relationship, $onModel)->get('data'),
+                default => $relationship['data'] ?? [],
             });
         }
 
